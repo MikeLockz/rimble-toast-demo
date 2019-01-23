@@ -101,17 +101,61 @@ class App extends Component {
       })
   }
 
+  resetCounter = () => {
+    this.contractMethodSendWrapper('reset')
+  }
+  incrementCounter = () => {
+    this.contractMethodSendWrapper('incrementCounter')
+  }
+  decrementCounter = () => {
+    this.contractMethodSendWrapper('decrementCounter')
+  }
+
   addTransaction = (transaction) => {
     this.setState({
       transactionList: [...this.state.transactionList, transaction]
     })
   }
 
-  componentDidMount() {
-    // console.log('mounted')
-    this.initContract()
+  contractMethodSendWrapper = (contractMethod) => {
+    // Show toast for starting transaction
+    console.log("Starting Transaction");
+    
+    const { contract, account } = this.state
+    
+    contract.methods[contractMethod]().send({ from: account })
+      .on('transactionHash', (hash) => {
+        // Submitted to block and received transaction hash
+        console.log(hash);
+        console.log("Transaction sent to block successfully. Result pending.");
+      })
+      .on('confirmation', (confirmationNumber, receipt) => {
+        // Confirmed with receipt
+        console.log("confirmation #: ", confirmationNumber, "receipt from confirm: ", receipt);
+        console.log("Transaction confirmed.");
 
-    // this.getNumber()
+        // check the status from result
+        if (receipt.status === true) {
+          console.log("Transaction completed successfully!");
+        } else if (receipt.status === false) {
+          console.log("Transaction reverted due to error.");
+        }
+      })
+      .on('receipt', (receipt) => {
+        // Received receipt
+        console.log("receipt: ", receipt);
+
+        // Update value
+        this.getNumber();
+      })
+      .on('error', (error) => {
+        // Errored out
+        console.log(error);
+      })
+}
+
+  componentDidMount() {
+    this.initContract()
   }
 
   render() {
@@ -124,20 +168,20 @@ class App extends Component {
         </header>
 
         <Box my={'auto'}>
-          <Card width={'420px'} mx={'auto'} px={4}>
-            <Heading.h1>Smart Contract Flow</Heading.h1>
+          <Card width={'400px'} mx={'auto'} px={4}>
+            <Heading.h1 fontSize={5} textAlign={'center'} px={4} mb={5}>Smart Contract Toast Example</Heading.h1>
             <Box>
-              <Box pb={4}>
-                <Text mb={4} fontSize={3}>
-                  Smart contract value: {this.state.value}
-            </Text>
-                <Text fontSize={6} textAlign={'center'}></Text>
+              <Box py={4}>
+                <Text mb={2} fontSize={3}>
+                  Value from smart contract: 
+                </Text>
+                <Text fontSize={6} textAlign={'center'}>{this.state.value}</Text>
               </Box>
 
               <Flex px={0} pt={4} borderTop={1} borderColor={'#E8E8E8'} justifyContent='space-between'>
-                <OutlineButton size={'medium'} onClick={this.addOne} mr={4}>Reset</OutlineButton>
-                <OutlineButton size={'medium'} onClick={this.addOne} mr={4}>Increment</OutlineButton>
-                <OutlineButton size={'medium'} onClick={this.addOne}>Decrement</OutlineButton>
+                <OutlineButton size={'medium'} onClick={this.resetCounter} mr={4}>Reset</OutlineButton>
+                <OutlineButton size={'medium'} onClick={this.incrementCounter} mr={4}>Increment</OutlineButton>
+                <OutlineButton size={'medium'} onClick={this.decrementCounter}>Decrement</OutlineButton>
               </Flex>
               <Flex mt={4} justifyContent='flex-end'>
                 
