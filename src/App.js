@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Card, Heading, Box, Button, OutlineButton, Text, Flex } from 'rimble-ui'
+import { Card, Heading, Box, Button, OutlineButton, Text, Flex, ToastMessage } from 'rimble-ui'
 import Web3 from 'web3' // uses latest 1.x.x version
+import TransactionList from './TransactionList' // uses latest 1.x.x version
+import RimbleWeb3Transaction from './RimbleWeb3Transaction'
 
 class App extends Component {
   state = {
@@ -80,7 +82,7 @@ class App extends Component {
           this.setState({ account: accounts[0] }, () => {
             // Wait for setState to finish
             console.log(this.state)
-            
+
             // Get initial number
             this.getNumber()
           })
@@ -94,7 +96,7 @@ class App extends Component {
     contract.methods.getCounter().call()
       .then(value => {
         value = Number(value.toString())
-        this.setState({value})
+        this.setState({ value })
       })
       .catch(error => {
         this.setState({ error })
@@ -111,35 +113,65 @@ class App extends Component {
     this.contractMethodSendWrapper('decrementCounter')
   }
 
-  addTransaction = (transaction) => {
+  addTransaction = (incomingTransaction) => {
+    let transaction = {}
+    transaction.lastUpdated = Date.now()
+    transaction = {...transaction, ...incomingTransaction}
+
+    this.state.transactionList.push(transaction)
     this.setState({
-      transactionList: [...this.state.transactionList, transaction]
+      transactionList: this.state.transactionList
     })
   }
 
   contractMethodSendWrapper = (contractMethod) => {
+    let transaction = {}
+    transaction.created = Date.now();
+    
     // Show toast for starting transaction
     console.log("Starting Transaction");
-    
+    transaction.status = 'Started'
+    this.addTransaction(transaction)
+
     const { contract, account } = this.state
-    
+
     contract.methods[contractMethod]().send({ from: account })
       .on('transactionHash', (hash) => {
         // Submitted to block and received transaction hash
-        console.log(hash);
         console.log("Transaction sent to block successfully. Result pending.");
+        transaction.status = 'Pending'
+        this.addTransaction(transaction)
       })
       .on('confirmation', (confirmationNumber, receipt) => {
+        
+        // Somehow determine if this is an already confirmed tx?
+        if (confirmationNumber > 0) {
+          return;
+        }
+
+        console.log("receipt: ", receipt)
+        
+        // Update transaction with receipt details
+        transaction = { ...transaction, ...receipt }
+        
         // Confirmed with receipt
-        console.log("confirmation #: ", confirmationNumber, "receipt from confirm: ", receipt);
         console.log("Transaction confirmed.");
+        transaction.status = "Confirmed"
+        
+        this.addTransaction(transaction)
 
         // check the status from result
         if (receipt.status === true) {
           console.log("Transaction completed successfully!");
+          transaction.status = 'Success'
         } else if (receipt.status === false) {
           console.log("Transaction reverted due to error.");
+          transaction.status = 'Error'
         }
+
+        this.addTransaction(transaction)
+
+        
       })
       .on('receipt', (receipt) => {
         // Received receipt
@@ -152,7 +184,7 @@ class App extends Component {
         // Errored out
         console.log(error);
       })
-}
+  }
 
   componentDidMount() {
     this.initContract()
@@ -161,19 +193,13 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-        </header>
-
         <Box my={'auto'}>
           <Card width={'400px'} mx={'auto'} px={4}>
             <Heading.h1 fontSize={5} textAlign={'center'} px={4} mb={5}>Smart Contract Toast Example</Heading.h1>
             <Box>
               <Box py={4}>
                 <Text mb={2} fontSize={3}>
-                  Value from smart contract: 
+                  Value from smart contract:
                 </Text>
                 <Text fontSize={6} textAlign={'center'}>{this.state.value}</Text>
               </Box>
@@ -184,13 +210,27 @@ class App extends Component {
                 <OutlineButton size={'medium'} onClick={this.decrementCounter}>Decrement</OutlineButton>
               </Flex>
               <Flex mt={4} justifyContent='flex-end'>
-                
+
                 <Button size={'medium'} onClick={this.getNumber}>Get Number</Button>
               </Flex>
+            </Box>
+          </Card>
 
-              <Box>
-                {/* <TransactionList transactionList={transactionList}></TransactionList> */}
-              </Box>
+          <Card width={'400px'} mx={'auto'} px={4}>
+            <Box>
+              <TransactionList transactionList={this.state.transactionList}></TransactionList>
+            </Box>
+          </Card>
+
+          <Card width={'400px'} mx={'auto'} px={4}>
+            <Box>
+              <Button mb={3} onClick={(e) => window.childComponent.addMessage(e)}>"addMessage"</Button>
+              <br />
+              <Button onClick={(e) => window.childComponent.removeMessage()}>"removeMessage"</Button>
+
+              <ToastMessage.Container ref={(childComponent) => { window.childComponent = childComponent }}>
+
+              </ToastMessage.Container>
             </Box>
           </Card>
         </Box>
