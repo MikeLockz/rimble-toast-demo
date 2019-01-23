@@ -8122,7 +8122,7 @@ rgba-regex@^1.0.0:
 
 "rimble-ui@git://github.com/ConsenSys/rimble-ui.git#ge-toastmessage-component":
   version "0.1.3"
-  resolved "git://github.com/ConsenSys/rimble-ui.git#3e7e56eaab95bb7820ba260210aa4e0195a4e492"
+  resolved "git://github.com/ConsenSys/rimble-ui.git#8329cca31500041ae6bcc4ea5d415ea6d5026d62"
   dependencies:
     "@d8660091/react-popper" "^1.0.4"
     "@svgr/rollup" "^4.1.0"
