@@ -139,6 +139,7 @@ class App extends Component {
           actionHref: '',
           actionText: '',
           variant: 'default',
+          icon: 'InfoOutline',
         }
         break;
       case 'pending':
@@ -260,22 +261,31 @@ class App extends Component {
               </Box>
 
               <Flex px={0} pt={4} borderTop={1} borderColor={'#E8E8E8'} justifyContent='space-between'>
-                <OutlineButton size={'medium'} onClick={this.resetCounter} mr={4}>Reset</OutlineButton>
+                {/* <OutlineButton size={'medium'} onClick={this.resetCounter} mr={4}>Reset</OutlineButton> */}
                 <OutlineButton size={'medium'} onClick={this.incrementCounter} mr={4}>Increment</OutlineButton>
                 <OutlineButton size={'medium'} onClick={this.decrementCounter}>Decrement</OutlineButton>
               </Flex>
-              <Flex mt={4} justifyContent='flex-end'>
+              {/* <Flex mt={4} justifyContent='flex-end'>
 
                 <Button size={'medium'} onClick={this.getNumber}>Get Number</Button>
-              </Flex>
+              </Flex> */}
             </Box>
           </Card>
 
-          {/* <Card width={'400px'} mx={'auto'} px={4}>
+          <Card width={'400px'} mx={'auto'} px={4}>
             <Box>
-              <TransactionList transactionList={this.state.transactionList}></TransactionList>
+              <p>Instructions:</p>
+              <ul>
+                <li>Make sure MetaMask is working in your browser</li>
+                <li>Set the network to Rinkeby Test Network</li>
+                <li>You'll need a little bit of eth for gas fees</li>
+              </ul>
+              
+              <p>About</p>
+              <p>This is an example of a webapp that interacts with a Smart Contract. This demo is using Web3.js and Rimble UI Components to show the status of a Smart Contract transaction. </p>
+
             </Box>
-          </Card> */}
+          </Card>
 
           <ToastMessage.Container ref={(toastProvider) => { window.toastProvider = toastProvider }}>
 
