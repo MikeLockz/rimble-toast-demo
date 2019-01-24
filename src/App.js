@@ -161,7 +161,7 @@ class App extends Component {
       case 'success':
         transactionToastMeta = {
           message: 'Transaction completed successfully',
-          actionHref: 'https://etherscan.io/tx/' + transactionHash,
+          actionHref: 'https://rinkeby.etherscan.io/tx/' + transactionHash,
           actionText: 'View on Etherscan',
           variant: 'success',
         }
@@ -169,7 +169,7 @@ class App extends Component {
       case 'error':
         transactionToastMeta = {
           message: 'Error',
-          actionHref: 'https://etherscan.io/tx/' + transactionHash,
+          actionHref: 'https://rinkeby.etherscan.io/tx/' + transactionHash,
           actionText: 'View on Etherscan',
           variant: 'failure',
         }
@@ -282,7 +282,7 @@ class App extends Component {
               </ul>
               
               <p>About</p>
-              <p>This is an example of a webapp that interacts with a Smart Contract. This demo is using Web3.js and Rimble UI Components to show the status of a Smart Contract transaction. </p>
+              <p>This is an example of a webapp that interacts with a Smart Contract. The demo uses Web3.js and Rimble UI Components to show the status of a Smart Contract transaction via toast messages. </p>
 
             </Box>
           </Card>
