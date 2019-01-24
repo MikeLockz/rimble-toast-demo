@@ -153,7 +153,7 @@ class App extends Component {
       case 'confirmed':
         transactionToastMeta = {
           message: 'Transaction is confirmed',
-          actionHref: 'https://etherscan.io/tx/' + transactionHash,
+          actionHref: 'https://rinkeby.etherscan.io/tx/' + transactionHash,
           actionText: 'View on Etherscan',
           variant: 'success',
         }
