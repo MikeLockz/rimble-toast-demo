@@ -170,7 +170,7 @@ class App extends Component {
           message: 'Error',
           actionHref: 'https://etherscan.io/tx/' + transactionHash,
           actionText: 'View on Etherscan',
-          variant: 'error',
+          variant: 'failure',
         }
         break;
       default:
