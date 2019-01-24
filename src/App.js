@@ -122,6 +122,61 @@ class App extends Component {
     this.setState({
       transactionList: this.state.transactionList
     })
+
+    let toastMeta = this.getTransactionToastMeta(transaction)
+    window.toastProvider.addMessage('Not sure where this appears...', toastMeta)
+  }
+
+  getTransactionToastMeta = (transaction) => {
+    let transactionToastMeta = {}
+    let status = transaction.status
+    let transactionHash = transaction.transactionHash
+
+    switch (status) {
+      case 'started':
+        transactionToastMeta = {
+          message: 'Started a new transaction',
+          actionHref: '',
+          actionText: '',
+          variant: 'default',
+        }
+        break;
+      case 'pending':
+        transactionToastMeta = {
+          message: 'Transaction is pending',
+          actionHref: '',
+          actionText: '',
+          variant: 'processing',
+        }
+        break;
+      case 'confirmed':
+        transactionToastMeta = {
+          message: 'Transaction is confirmed',
+          actionHref: 'https://etherscan.io/tx/' + transactionHash,
+          actionText: 'View on Etherscan',
+          variant: 'success',
+        }
+        break;
+      case 'success':
+        transactionToastMeta = {
+          message: 'Transaction completed successfully',
+          actionHref: 'https://etherscan.io/tx/' + transactionHash,
+          actionText: 'View on Etherscan',
+          variant: 'success',
+        }
+        break;
+      case 'error':
+        transactionToastMeta = {
+          message: 'Error',
+          actionHref: 'https://etherscan.io/tx/' + transactionHash,
+          actionText: 'View on Etherscan',
+          variant: 'error',
+        }
+        break;
+      default:
+        break;
+    }
+    return transactionToastMeta
   }
 
   contractMethodSendWrapper = (contractMethod) => {
@@ -130,7 +185,7 @@ class App extends Component {
     
     // Show toast for starting transaction
     console.log("Starting Transaction");
-    transaction.status = 'Started'
+    transaction.status = 'started'
     this.addTransaction(transaction)
 
     const { contract, account } = this.state
@@ -139,7 +194,7 @@ class App extends Component {
       .on('transactionHash', (hash) => {
         // Submitted to block and received transaction hash
         console.log("Transaction sent to block successfully. Result pending.");
-        transaction.status = 'Pending'
+        transaction.status = 'pending'
         this.addTransaction(transaction)
       })
       .on('confirmation', (confirmationNumber, receipt) => {
@@ -156,17 +211,17 @@ class App extends Component {
         
         // Confirmed with receipt
         console.log("Transaction confirmed.");
-        transaction.status = "Confirmed"
+        transaction.status = "confirmed"
         
         this.addTransaction(transaction)
 
         // check the status from result
         if (receipt.status === true) {
           console.log("Transaction completed successfully!");
-          transaction.status = 'Success'
+          transaction.status = 'success'
         } else if (receipt.status === false) {
           console.log("Transaction reverted due to error.");
-          transaction.status = 'Error'
+          transaction.status = 'error'
         }
 
         this.addTransaction(transaction)
@@ -216,23 +271,15 @@ class App extends Component {
             </Box>
           </Card>
 
-          <Card width={'400px'} mx={'auto'} px={4}>
+          {/* <Card width={'400px'} mx={'auto'} px={4}>
             <Box>
               <TransactionList transactionList={this.state.transactionList}></TransactionList>
             </Box>
-          </Card>
+          </Card> */}
 
-          <Card width={'400px'} mx={'auto'} px={4}>
-            <Box>
-              <Button mb={3} onClick={(e) => window.childComponent.addMessage(e)}>"addMessage"</Button>
-              <br />
-              <Button onClick={(e) => window.childComponent.removeMessage()}>"removeMessage"</Button>
+          <ToastMessage.Container ref={(toastProvider) => { window.toastProvider = toastProvider }}>
 
-              <ToastMessage.Container ref={(childComponent) => { window.childComponent = childComponent }}>
-
-              </ToastMessage.Container>
-            </Box>
-          </Card>
+          </ToastMessage.Container>
         </Box>
       </div>
     );
