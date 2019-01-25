@@ -261,7 +261,7 @@ class App extends Component {
               </Box>
 
               <Flex px={0} pt={4} borderTop={1} borderColor={'#E8E8E8'} justifyContent='space-between'>
-                {/* <OutlineButton size={'medium'} onClick={this.resetCounter} mr={4}>Reset</OutlineButton> */}
+                <OutlineButton size={'medium'} onClick={this.resetCounter} mr={4}>Reset</OutlineButton>
                 <OutlineButton size={'medium'} onClick={this.incrementCounter} mr={4}>Increment</OutlineButton>
                 <OutlineButton size={'medium'} onClick={this.decrementCounter}>Decrement</OutlineButton>
               </Flex>
