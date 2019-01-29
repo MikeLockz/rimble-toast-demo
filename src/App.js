@@ -287,9 +287,7 @@ class App extends Component {
             </Box>
           </Card>
 
-          <ToastMessage.Container ref={(toastProvider) => { window.toastProvider = toastProvider }}>
-
-          </ToastMessage.Container>
+          <ToastMessage.Provider ref={(node) => (window.toastProvider = node)} />
         </Box>
       </div>
     );
