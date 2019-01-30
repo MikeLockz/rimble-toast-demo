@@ -11,14 +11,20 @@ class App extends Component {
     account: {},
     value: 0,
     error: null,
-    transactionList: [],
   }
 
   initContract = () => {
     // Instantiate provider (like metamask)
-    const web3 = new Web3(window.web3.currentProvider)
+    // const web3 = new Web3(window.web3.currentProvider) // 1.0.0 way
+    if (typeof window.web3 !== 'undefined') {
+      window.web3 = new Web3(window.web3.currentProvider);
+     } else {
+      // set the provider you want from Web3.providers
+      window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+     }
+     
 
-    // // Address of the deployed smart contract (from etherscan)
+    // Address of the deployed smart contract (from etherscan)
     const address = "0x0f69f0ac4b92bf0d101b5747eed3fa6b653a36f8"
 
     // Copied from remix ide
@@ -72,174 +78,37 @@ class App extends Component {
       }
     ];
 
-    console.log('creating contract')
-    const contract = new web3.eth.Contract(abi, address)
-    console.log(contract)
-    this.setState({ contract }, () => {
-      // Wait for setState to finish
-      web3.eth.getAccounts()
-        .then((accounts) => {
-          this.setState({ account: accounts[0] }, () => {
-            // Wait for setState to finish
-            console.log(this.state)
-
-            // Get initial number
-            this.getNumber()
-          })
-        })
-    })
-  }
-
-  // gets the number stored in smart contract storage
-  getNumber = () => {
-    const { contract, account } = this.state;
-    contract.methods.getCounter().call()
-      .then(value => {
-        value = Number(value.toString())
-        this.setState({ value })
-      })
-      .catch(error => {
-        this.setState({ error })
-      })
-  }
-
-  resetCounter = () => {
-    this.contractMethodSendWrapper('reset')
-  }
-  incrementCounter = () => {
-    this.contractMethodSendWrapper('incrementCounter')
-  }
-  decrementCounter = () => {
-    this.contractMethodSendWrapper('decrementCounter')
-  }
-
-  addTransaction = (incomingTransaction) => {
-    let transaction = {}
-    transaction.lastUpdated = Date.now()
-    transaction = {...transaction, ...incomingTransaction}
-
-    this.state.transactionList.push(transaction)
-    this.setState({
-      transactionList: this.state.transactionList
-    })
-
-    let toastMeta = this.getTransactionToastMeta(transaction)
-    window.toastProvider.addMessage('Not sure where this appears...', toastMeta)
-  }
-
-  getTransactionToastMeta = (transaction) => {
-    let transactionToastMeta = {}
-    let status = transaction.status
-    let transactionHash = transaction.transactionHash
-
-    switch (status) {
-      case 'started':
-        transactionToastMeta = {
-          message: 'Started a new transaction',
-          actionHref: '',
-          actionText: '',
-          variant: 'default',
-          icon: 'InfoOutline',
-        }
-        break;
-      case 'pending':
-        transactionToastMeta = {
-          message: 'Transaction is pending',
-          actionHref: '',
-          actionText: '',
-          variant: 'processing',
-        }
-        break;
-      case 'confirmed':
-        transactionToastMeta = {
-          message: 'Transaction is confirmed',
-          actionHref: 'https://rinkeby.etherscan.io/tx/' + transactionHash,
-          actionText: 'View on Etherscan',
-          variant: 'success',
-        }
-        break;
-      case 'success':
-        transactionToastMeta = {
-          message: 'Transaction completed successfully',
-          actionHref: 'https://rinkeby.etherscan.io/tx/' + transactionHash,
-          actionText: 'View on Etherscan',
-          variant: 'success',
-        }
-        break;
-      case 'error':
-        transactionToastMeta = {
-          message: 'Error',
-          actionHref: 'https://rinkeby.etherscan.io/tx/' + transactionHash,
-          actionText: 'View on Etherscan',
-          variant: 'failure',
-        }
-        break;
-      default:
-        break;
-    }
-    return transactionToastMeta
-  }
-
-  contractMethodSendWrapper = (contractMethod) => {
-    let transaction = {}
-    transaction.created = Date.now();
+    const bncAssistConfig = {
+      dappId: "2163fd61f5792c8a221d",
+      networkId: 4,
+      web3: window.web3
+    };
     
-    // Show toast for starting transaction
-    console.log("Starting Transaction");
-    transaction.status = 'started'
-    this.addTransaction(transaction)
+    const assistInstance = window.assist.init(bncAssistConfig);
 
-    const { contract, account } = this.state
-
-    contract.methods[contractMethod]().send({ from: account })
-      .on('transactionHash', (hash) => {
-        // Submitted to block and received transaction hash
-        console.log("Transaction sent to block successfully. Result pending.");
-        transaction.status = 'pending'
-        this.addTransaction(transaction)
+    assistInstance.onboard()
+      .then(function(success) {
+        // User has been successfully onboarded and is ready to transact
       })
-      .on('confirmation', (confirmationNumber, receipt) => {
-        
-        // Somehow determine if this is an already confirmed tx?
-        if (confirmationNumber > 0) {
-          return;
-        }
-
-        console.log("receipt: ", receipt)
-        
-        // Update transaction with receipt details
-        transaction = { ...transaction, ...receipt }
-        
-        // Confirmed with receipt
-        console.log("Transaction confirmed.");
-        transaction.status = "confirmed"
-        
-        this.addTransaction(transaction)
-
-        // check the status from result
-        if (receipt.status === true) {
-          console.log("Transaction completed successfully!");
-          transaction.status = 'success'
-        } else if (receipt.status === false) {
-          console.log("Transaction reverted due to error.");
-          transaction.status = 'error'
-        }
-
-        this.addTransaction(transaction)
-
-        
+      .catch(function(error) {
+        // The user exited onboarding before completion
+        // Will let you know what stage of onboarding the user was up to when they exited
+        console.log(error.msg);
       })
-      .on('receipt', (receipt) => {
-        // Received receipt
-        console.log("receipt: ", receipt);
 
-        // Update value
-        this.getNumber();
+    let myContract = new window.web3.eth.Contract(abi, address);
+    console.log('contract: ', myContract)
+    
+    let myDecoratedContract = assistInstance.Contract(myContract)
+    console.log('myDecoratedContract: ', myDecoratedContract)
+    
+    this.setState({ contract: myDecoratedContract })
+
+    assistInstance.getState()
+      .then(function(state) {
+        console.log('state: ', state)
       })
-      .on('error', (error) => {
-        // Errored out
-        console.log(error);
-      })
+
   }
 
   componentDidMount() {
