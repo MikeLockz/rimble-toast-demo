@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Card, Heading, Box, Button, OutlineButton, Text, Flex, ToastMessage } from 'rimble-ui'
+import { Card, Heading, Box, Button, OutlineButton, Text, Flex, ToastMessage, ThemeProvider } from 'rimble-ui'
 import Web3 from 'web3' // uses latest 1.x.x version
 import TransactionList from './TransactionList' // uses latest 1.x.x version
 import RimbleWeb3Transaction from './RimbleWeb3Transaction'
+import theme from './theme'
 
 class App extends Component {
   state = {
@@ -12,13 +13,17 @@ class App extends Component {
     value: 0,
     error: null,
     transactionList: [],
+    connected: false,
+    signedIn: false,
+    walletAddress: '',
+    agreedToTerms: false,
   }
 
   initContract = () => {
     // Instantiate provider (like metamask)
     const web3 = new Web3(window.web3.currentProvider)
 
-    // // Address of the deployed smart contract (from etherscan)
+    // Address of the deployed smart contract (from etherscan)
     const address = "0x0f69f0ac4b92bf0d101b5747eed3fa6b653a36f8"
 
     // Copied from remix ide
@@ -83,7 +88,7 @@ class App extends Component {
             // Wait for setState to finish
             console.log(this.state)
 
-            // Get initial number
+            // Get initial number -> is this possible without account access?
             this.getNumber()
           })
         })
@@ -111,6 +116,47 @@ class App extends Component {
   }
   decrementCounter = () => {
     this.contractMethodSendWrapper('decrementCounter')
+  }
+
+  connectWallet = async () => {
+    if (window.ethereum) {
+      window.web3 = new Web3(window.ethereum);
+      try {
+        // Request account access if needed
+        await window.ethereum.enable().then( (walletAddress) => {
+          console.log('wallet address:', walletAddress);
+          const connected = true
+          // Enable Sign In button
+          this.setState({ connected, walletAddress: walletAddress[0] })
+        });
+        // Acccounts now exposed
+        // window.web3.eth.sendTransaction({/* ... */});
+      } catch (error) {
+          // User denied account access...
+      }
+    }
+    // Legacy dapp browsers...
+    else if (window.web3) {
+      window.web3 = new Web3(window.web3.currentProvider);
+      // Acccounts always exposed
+      window.web3.eth.sendTransaction({/* ... */});
+    }
+    // Non-dapp browsers...
+    else {
+      console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+    }
+  }
+
+  signMessage = async (message) => {
+    const account = this.state.walletAddress;
+    try {
+      const hexMessage = window.web3.utils.utf8ToHex(message)
+
+      await window.web3.eth.personal.sign(hexMessage, account)
+      
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   addTransaction = (incomingTransaction) => {
@@ -242,54 +288,86 @@ class App extends Component {
       })
   }
 
+  connectToWallet = () => {
+
+  }
+
+  agreetoToS = () => {
+    const message = `Terms of Service`
+
+    this.signMessage(message).then((response) => {
+      console.log('agreed to ToS', response)
+
+      this.setState({
+        agreedToTerms: true,
+      })
+    })
+  }
+
+  createAccount = () => {
+    const message = `Sign in with most recent nonce: ${Date.now()}`
+
+    this.signMessage(message).then((err, response) => {
+      if (!err) {
+        this.setState({
+          signedIn: true
+        })
+      }
+    })
+  }
+
   componentDidMount() {
     this.initContract()
   }
 
   render() {
     return (
-      <div className="App">
-        <Box my={'auto'}>
-          <Card width={'400px'} mx={'auto'} px={4}>
-            <Heading.h1 fontSize={5} textAlign={'center'} px={4} mb={5}>Smart Contract Toast Example</Heading.h1>
-            <Box>
-              <Box py={4}>
-                <Text mb={2} fontSize={3}>
-                  Value from smart contract:
-                </Text>
-                <Text fontSize={6} textAlign={'center'}>{this.state.value}</Text>
+      <ThemeProvider theme={theme}>
+        <div className="App">
+          <Box my={'auto'}>
+            <Card width={'600px'} mx={'auto'} px={4}>
+              <Heading.h1 fontSize={5} textAlign={'center'} px={4} mb={5}>Smart Contract Toast Example</Heading.h1>
+              <Box>
+                <Box py={4}>
+                  <Text mb={2} fontSize={3}>
+                    Value from smart contract:
+                  </Text>
+                  <Text fontSize={6} textAlign={'center'}>{this.state.value}</Text> {/* Number will always come in  */}
+                </Box>
+
+                <Flex borderTop={1} borderColor={'#E8E8E8'} justifyContent='space-between' py={4} >
+                  <Button onClick={this.connectWallet} disabled={this.state.connected} mr={4}>Connect</Button>
+                  <Button onClick={this.agreetoToS} disabled={!this.state.connected || this.state.agreedToTerms} mr={4}>Agree to terms</Button>
+                  <Button onClick={this.createAccount} disabled={!this.state.agreedToTerms || this.state.signedIn}>Sign In</Button>
+                </Flex>
+
+                <Flex px={0} pt={4} borderTop={1} borderColor={'#E8E8E8'} justifyContent='space-between'>
+                  <OutlineButton size={'medium'} onClick={this.resetCounter} mr={4} disabled={!this.state.signedIn }>Reset</OutlineButton>
+                  <OutlineButton size={'medium'} onClick={this.incrementCounter} mr={4} disabled={!this.state.signedIn }>Increment</OutlineButton>
+                  <OutlineButton size={'medium'} onClick={this.decrementCounter} disabled={!this.state.signedIn }>Decrement</OutlineButton>
+                </Flex>
               </Box>
+            </Card>
 
-              <Flex px={0} pt={4} borderTop={1} borderColor={'#E8E8E8'} justifyContent='space-between'>
-                <OutlineButton size={'medium'} onClick={this.resetCounter} mr={4}>Reset</OutlineButton>
-                <OutlineButton size={'medium'} onClick={this.incrementCounter} mr={4}>Increment</OutlineButton>
-                <OutlineButton size={'medium'} onClick={this.decrementCounter}>Decrement</OutlineButton>
-              </Flex>
-              {/* <Flex mt={4} justifyContent='flex-end'>
+            <Card width={'600px'} mx={'auto'} px={4}>
+              <Box>
+                <p>Instructions:</p>
+                <ul>
+                  <li>Make sure MetaMask is working in your browser</li>
+                  <li>Set the network to Rinkeby Test Network</li>
+                  <li>You'll need a little bit of eth for gas fees</li>
+                </ul>
+                
+                <p>About</p>
+                <p>This is an example of a webapp that interacts with a Smart Contract. The demo uses Web3.js and Rimble UI Components to show the status of a Smart Contract transaction via toast messages. </p>
 
-                <Button size={'medium'} onClick={this.getNumber}>Get Number</Button>
-              </Flex> */}
-            </Box>
-          </Card>
+              </Box>
+            </Card>
 
-          <Card width={'400px'} mx={'auto'} px={4}>
-            <Box>
-              <p>Instructions:</p>
-              <ul>
-                <li>Make sure MetaMask is working in your browser</li>
-                <li>Set the network to Rinkeby Test Network</li>
-                <li>You'll need a little bit of eth for gas fees</li>
-              </ul>
-              
-              <p>About</p>
-              <p>This is an example of a webapp that interacts with a Smart Contract. The demo uses Web3.js and Rimble UI Components to show the status of a Smart Contract transaction via toast messages. </p>
-
-            </Box>
-          </Card>
-
-          <ToastMessage.Provider ref={(node) => (window.toastProvider = node)} />
-        </Box>
-      </div>
+            <ToastMessage.Provider ref={(node) => (window.toastProvider = node)} />
+          </Box>
+        </div>
+      </ThemeProvider>
     );
   }
 }
