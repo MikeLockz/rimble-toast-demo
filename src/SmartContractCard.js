@@ -9,6 +9,60 @@ import {
   OutlineButton
 } from "rimble-ui";
 
+// Address of the deployed smart contract (from etherscan)
+const contractAddress = "0x0f69f0ac4b92bf0d101b5747eed3fa6b653a36f8";
+
+// Copied from remix ide
+const contractAbi = [
+  {
+    constant: false,
+    inputs: [],
+    name: "decrementCounter",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    constant: false,
+    inputs: [],
+    name: "incrementCounter",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    constant: false,
+    inputs: [],
+    name: "reset",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    inputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "constructor"
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: "getCounter",
+    outputs: [
+      {
+        name: "",
+        type: "int256"
+      }
+    ],
+    payable: false,
+    stateMutability: "view",
+    type: "function"
+  }
+];
+
 class SmartContractCard extends React.Component {
   state = {
     value: 0
@@ -45,6 +99,11 @@ class SmartContractCard extends React.Component {
   // TODO: onTransactionReceipt
 
   // TODO: when to get the number for the first time?
+
+  componentDidMount() {
+    // this.props.initAccount();
+    // this.props.initContract(contractAddress, contractAbi);
+  }
 
   render() {
     return (

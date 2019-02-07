@@ -11,9 +11,17 @@ class App extends Component {
         <Box my={"auto"}>
           <RimbleTransaction>
             {/* Render Props pattern */}
-            {({ contractMethodSendWrapper, contract, account }) => (
+            {({
+              contractMethodSendWrapper,
+              initAccount,
+              initContract,
+              contract,
+              account
+            }) => (
               <SmartContractCard
                 contractMethodSendWrapper={contractMethodSendWrapper}
+                initAccount={initAccount}
+                initContract={initContract}
                 contract={contract}
                 account={account}
               />

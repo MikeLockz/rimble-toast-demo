@@ -9,80 +9,66 @@ class RimbleTransaction extends React.Component {
   };
 
   initWeb3 = async () => {
-    // Instantiate provider (like metamask)
-    const web3 = await new Web3(window.web3.currentProvider);
+    let web3 = {};
+
+    // Check for modern web3 provider
+    if (window.ethereum) {
+      console.log("Using modern web3 provider.");
+      web3 = new Web3(window.ethereum);
+    }
+    // Legacy dapp browsers, public wallet address always exposed
+    else if (window.web3) {
+      console.log("Legacy web3 provider. Try updating.");
+      web3 = new Web3(window.web3.currentProvider);
+    }
+    // Non-dapp browsers...
+    else {
+      console.log(
+        "Non-Ethereum browser detected. You should consider trying MetaMask!"
+      );
+      web3 = false;
+    }
+
     this.setState({ web3 });
   };
 
-  initContract = () => {
-    // Address of the deployed smart contract (from etherscan)
-    const address = "0x0f69f0ac4b92bf0d101b5747eed3fa6b653a36f8";
-
-    // Copied from remix ide
-    var abi = [
-      {
-        constant: false,
-        inputs: [],
-        name: "decrementCounter",
-        outputs: [],
-        payable: false,
-        stateMutability: "nonpayable",
-        type: "function"
-      },
-      {
-        constant: false,
-        inputs: [],
-        name: "incrementCounter",
-        outputs: [],
-        payable: false,
-        stateMutability: "nonpayable",
-        type: "function"
-      },
-      {
-        constant: false,
-        inputs: [],
-        name: "reset",
-        outputs: [],
-        payable: false,
-        stateMutability: "nonpayable",
-        type: "function"
-      },
-      {
-        inputs: [],
-        payable: false,
-        stateMutability: "nonpayable",
-        type: "constructor"
-      },
-      {
-        constant: true,
-        inputs: [],
-        name: "getCounter",
-        outputs: [
-          {
-            name: "",
-            type: "int256"
-          }
-        ],
-        payable: false,
-        stateMutability: "view",
-        type: "function"
-      }
-    ];
-
+  initContract = (address, abi) => {
     console.log("creating contract");
+
+    // this.initWeb3().then(() => {
+    //   this.initAccount();
+    //   const contract = new this.state.web3.eth.Contract(abi, address);
+    //   console.log(contract);
+    //   this.setState({ contract });
+    // });
     const contract = new this.state.web3.eth.Contract(abi, address);
     console.log(contract);
     this.setState({ contract });
   };
 
-  initAccount = () => {
-    // Wait for setState to finish
-    this.state.web3.eth.getAccounts().then(accounts => {
-      this.setState({ account: accounts[0] }, () => {
-        // Wait for setState to finish
-        console.log(this.state);
+  initAccount = async () => {
+    try {
+      // Request account access if needed
+      await window.ethereum.enable().then(walletAddress => {
+        console.log("wallet address:", walletAddress);
+        const connected = true;
+        // Enable Sign In button
+        this.setState({ connected, walletAddress: walletAddress[0] });
       });
-    });
+      // Acccounts now exposed
+      // this.setState({ web3 });
+    } catch (error) {
+      // User denied account access...
+      console.log("error:", error);
+    }
+
+    // this.state.web3.eth.getAccounts().then(accounts => {
+    //   console.log(accounts);
+    //   this.setState({ account: accounts[0] }, () => {
+    //     // Wait for setState to finish
+    //     console.log("initialized account: ", this.state.account);
+    //   });
+    // });
   };
 
   addTransaction = incomingTransaction => {
@@ -209,14 +195,16 @@ class RimbleTransaction extends React.Component {
 
   componentDidMount() {
     this.initWeb3().then(() => {
-      this.initContract();
-      this.initAccount();
+      // Do we need to init an account immediately?
+      // this.initAccount();
     });
   }
 
   render() {
     return this.props.children({
       contractMethodSendWrapper: this.contractMethodSendWrapper,
+      initAccount: this.initAccount,
+      initContract: this.initContract,
       contract: this.state.contract,
       account: this.state.account
     });
