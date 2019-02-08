@@ -31,8 +31,8 @@ class App extends Component {
                         initAccount={initAccount}
                         contractMethodSendWrapper={contractMethodSendWrapper}
                       />
-
-                      <TransactionStatusCard />
+                      {/* FUTURE: We need to make sure multiple components can consume a transaction's status */}
+                      {/* <TransactionStatusCard /> */}
                     </div>
                   ) : null}
                 </div>
