@@ -98,8 +98,6 @@ class SmartContractCard extends React.Component {
 
   // TODO: onTransactionReceipt
 
-  // TODO: when to get the number for the first time?
-
   componentDidMount() {
     // Init the contract after the web3 provider has been determined
     this.props.initContract(contractAddress, contractAbi).then(() => {
@@ -167,7 +165,5 @@ class SmartContractCard extends React.Component {
     );
   }
 }
-
-// SmartContractCard.contextType = RimbleTransactionContext;
 
 export default SmartContractCard;

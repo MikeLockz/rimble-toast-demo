@@ -76,73 +76,6 @@ class RimbleTransaction extends React.Component {
     }
   };
 
-  showTransactionToast = incomingTransaction => {
-    let transaction = {};
-    // Add extra info to transaction
-    transaction.lastUpdated = Date.now();
-    transaction = { ...transaction, ...incomingTransaction };
-
-    // Get text info for toast
-    let toastMeta = this.getTransactionToastMeta(transaction);
-
-    // Show toast
-    window.toastProvider.addMessage("...", toastMeta);
-  };
-
-  getTransactionToastMeta = transaction => {
-    let transactionToastMeta = {};
-    let status = transaction.status;
-    let transactionHash = transaction.transactionHash;
-
-    // TODO: Move this into external file and import
-    switch (status) {
-      case "started":
-        transactionToastMeta = {
-          message: "Started a new transaction",
-          actionHref: "",
-          actionText: "",
-          variant: "default",
-          icon: "InfoOutline"
-        };
-        break;
-      case "pending":
-        transactionToastMeta = {
-          message: "Transaction is pending",
-          actionHref: "",
-          actionText: "",
-          variant: "processing"
-        };
-        break;
-      case "confirmed":
-        transactionToastMeta = {
-          message: "Transaction is confirmed",
-          actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
-          actionText: "View on Etherscan",
-          variant: "success"
-        };
-        break;
-      case "success":
-        transactionToastMeta = {
-          message: "Transaction completed successfully",
-          actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
-          actionText: "View on Etherscan",
-          variant: "success"
-        };
-        break;
-      case "error":
-        transactionToastMeta = {
-          message: "Error",
-          actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
-          actionText: "View on Etherscan",
-          variant: "failure"
-        };
-        break;
-      default:
-        break;
-    }
-    return transactionToastMeta;
-  };
-
   contractMethodSendWrapper = contractMethod => {
     let transaction = {};
     transaction.created = Date.now();
@@ -224,6 +157,73 @@ class RimbleTransaction extends React.Component {
       transaction.status = "error";
       this.showTransactionToast(transaction);
     }
+  };
+
+  showTransactionToast = incomingTransaction => {
+    let transaction = {};
+    // Add extra info to transaction
+    transaction.lastUpdated = Date.now();
+    transaction = { ...transaction, ...incomingTransaction };
+
+    // Get text info for toast
+    let toastMeta = this.getTransactionToastMeta(transaction);
+
+    // Show toast
+    window.toastProvider.addMessage("...", toastMeta);
+  };
+
+  getTransactionToastMeta = transaction => {
+    let transactionToastMeta = {};
+    let status = transaction.status;
+    let transactionHash = transaction.transactionHash;
+
+    // TODO: Move this into external file and import
+    switch (status) {
+      case "started":
+        transactionToastMeta = {
+          message: "Started a new transaction",
+          actionHref: "",
+          actionText: "",
+          variant: "default",
+          icon: "InfoOutline"
+        };
+        break;
+      case "pending":
+        transactionToastMeta = {
+          message: "Transaction is pending",
+          actionHref: "",
+          actionText: "",
+          variant: "processing"
+        };
+        break;
+      case "confirmed":
+        transactionToastMeta = {
+          message: "Transaction is confirmed",
+          actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
+          actionText: "View on Etherscan",
+          variant: "success"
+        };
+        break;
+      case "success":
+        transactionToastMeta = {
+          message: "Transaction completed successfully",
+          actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
+          actionText: "View on Etherscan",
+          variant: "success"
+        };
+        break;
+      case "error":
+        transactionToastMeta = {
+          message: "Error",
+          actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
+          actionText: "View on Etherscan",
+          variant: "failure"
+        };
+        break;
+      default:
+        break;
+    }
+    return transactionToastMeta;
   };
 
   state = {

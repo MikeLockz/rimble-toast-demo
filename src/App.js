@@ -1,16 +1,17 @@
 import React, { Component } from "react";
 import { Box, ToastMessage } from "rimble-ui";
-import SmartContractCard from "./SmartContractCard";
-import RimbleTransaction from "./RimbleTransaction";
-import InstructionsCard from "./InstructionsCard";
+import SmartContractCard from "./components/SmartContractCard";
+import RimbleWeb3 from "./components/RimbleWeb3";
+import InstructionsCard from "./components/InstructionsCard";
+import TransactionStatusCard from "./components/TransactionStatusCard";
 
 class App extends Component {
   render() {
     return (
       <div className="App">
         <Box my={"auto"}>
-          <RimbleTransaction>
-            <RimbleTransaction.Consumer>
+          <RimbleWeb3>
+            <RimbleWeb3.Consumer>
               {({
                 web3,
                 contract,
@@ -20,20 +21,24 @@ class App extends Component {
                 contractMethodSendWrapper
               }) => (
                 <div>
-                  {/* Conditionally render the comonents dependent on web3 being loaded */}
+                  {/* Conditionally render child comonents dependent on web3 being loaded */}
                   {web3 ? (
-                    <SmartContractCard
-                      contract={contract}
-                      account={account}
-                      initContract={initContract}
-                      initAccount={initAccount}
-                      contractMethodSendWrapper={contractMethodSendWrapper}
-                    />
+                    <div>
+                      <SmartContractCard
+                        contract={contract}
+                        account={account}
+                        initContract={initContract}
+                        initAccount={initAccount}
+                        contractMethodSendWrapper={contractMethodSendWrapper}
+                      />
+
+                      <TransactionStatusCard />
+                    </div>
                   ) : null}
                 </div>
               )}
-            </RimbleTransaction.Consumer>
-          </RimbleTransaction>
+            </RimbleWeb3.Consumer>
+          </RimbleWeb3>
           <ToastMessage.Provider ref={node => (window.toastProvider = node)} />
         </Box>
 
