@@ -23,7 +23,6 @@ class App extends Component {
                   {/* Conditionally render the comonents dependent on web3 being loaded */}
                   {web3 ? (
                     <SmartContractCard
-                      web3={web3}
                       contract={contract}
                       account={account}
                       initContract={initContract}

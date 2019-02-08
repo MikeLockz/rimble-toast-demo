@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Card,
-  Heading,
-  Box,
-  Text,
-  Flex,
-  Button,
-  OutlineButton
-} from "rimble-ui";
+import { Card, Heading, Box, Text, Flex, OutlineButton } from "rimble-ui";
 import ConnectButton from "./ConnectButton";
 
 // Address of the deployed smart contract (from etherscan)
