@@ -8,6 +8,7 @@ import {
   Button,
   OutlineButton
 } from "rimble-ui";
+import ConnectButton from "./ConnectButton";
 
 // Address of the deployed smart contract (from etherscan)
 const contractAddress = "0x0f69f0ac4b92bf0d101b5747eed3fa6b653a36f8";
@@ -138,16 +139,10 @@ class SmartContractCard extends React.Component {
             borderColor={"#E8E8E8"}
             justifyContent="space-between"
           >
-            <Button
-              size={"medium"}
-              mr={4}
-              onClick={() => {
-                this.props.initAccount();
-              }}
-              disabled={this.props.account}
-            >
-              Connect
-            </Button>
+            <ConnectButton
+              initAccount={this.props.initAccount}
+              account={this.props.account}
+            />
 
             <OutlineButton
               size={"medium"}
