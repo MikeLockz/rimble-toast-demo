@@ -114,7 +114,7 @@ class RimbleTransaction extends React.Component {
             console.log(
               "Confirmation " +
                 confirmationNumber +
-                ". Confidence threshold already."
+                ". Confidence threshold already met."
             );
             return;
           }
