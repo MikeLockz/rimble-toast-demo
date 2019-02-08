@@ -69,19 +69,26 @@ class SmartContractCard extends React.Component {
   };
 
   // gets the number stored in smart contract storage
-  getNumber = () => {
+  getNumber = ({ ...props }) => {
     const { contract } = this.props;
-    contract.methods
-      .getCounter()
-      .call()
-      .then(value => {
-        value = Number(value.toString());
-        this.setState({ value });
-      })
-      .catch(error => {
-        // TODO: pass error back up to RimbleTransaction component?
-        this.setState({ error });
-      });
+    try {
+      contract.methods
+        .getCounter()
+        .call()
+        .then(value => {
+          value = Number(value.toString());
+          this.setState({ value });
+        })
+        .catch(error => {
+          // TODO: pass error back up to RimbleTransaction component?
+          console.log(error);
+          this.setState({ error });
+        });
+    } catch (error) {
+      // TODO: pass error back up to RimbleTransaction component?
+      console.log("error", error);
+    }
+    console.log("got number", this.state.value);
   };
 
   resetCounter = () => {
@@ -101,8 +108,11 @@ class SmartContractCard extends React.Component {
   // TODO: when to get the number for the first time?
 
   componentDidMount() {
-    // this.props.initAccount();
-    // this.props.initContract(contractAddress, contractAbi);
+    // Init the contract after the web3 provider has been determined
+    this.props.initContract(contractAddress, contractAbi).then(() => {
+      // Can finally interact with contract
+      this.getNumber();
+    });
   }
 
   render() {
@@ -128,11 +138,23 @@ class SmartContractCard extends React.Component {
             borderColor={"#E8E8E8"}
             justifyContent="space-between"
           >
-            <Button size={"medium"} mr={4} onClick={this.getNumber}>
-              Get Number
+            <Button
+              size={"medium"}
+              mr={4}
+              onClick={() => {
+                this.props.initAccount();
+              }}
+              disabled={this.props.account}
+            >
+              Connect
             </Button>
 
-            <OutlineButton size={"medium"} mr={4} onClick={this.resetCounter}>
+            <OutlineButton
+              size={"medium"}
+              mr={4}
+              onClick={this.resetCounter}
+              disabled={!this.props.account}
+            >
               Reset
             </OutlineButton>
 
@@ -140,11 +162,16 @@ class SmartContractCard extends React.Component {
               size={"medium"}
               mr={4}
               onClick={this.incrementCounter}
+              disabled={!this.props.account}
             >
               Increment
             </OutlineButton>
 
-            <OutlineButton size={"medium"} onClick={this.decrementCounter}>
+            <OutlineButton
+              size={"medium"}
+              onClick={this.decrementCounter}
+              disabled={!this.props.account}
+            >
               Decrement
             </OutlineButton>
           </Flex>
@@ -153,5 +180,7 @@ class SmartContractCard extends React.Component {
     );
   }
 }
+
+// SmartContractCard.contextType = RimbleTransactionContext;
 
 export default SmartContractCard;

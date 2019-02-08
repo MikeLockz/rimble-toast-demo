@@ -10,22 +10,30 @@ class App extends Component {
       <div className="App">
         <Box my={"auto"}>
           <RimbleTransaction>
-            {/* Render Props pattern */}
-            {({
-              contractMethodSendWrapper,
-              initAccount,
-              initContract,
-              contract,
-              account
-            }) => (
-              <SmartContractCard
-                contractMethodSendWrapper={contractMethodSendWrapper}
-                initAccount={initAccount}
-                initContract={initContract}
-                contract={contract}
-                account={account}
-              />
-            )}
+            <RimbleTransaction.Consumer>
+              {({
+                web3,
+                contract,
+                account,
+                initContract,
+                initAccount,
+                contractMethodSendWrapper
+              }) => (
+                <div>
+                  {/* Conditionally render the comonents dependent on web3 being loaded */}
+                  {web3 ? (
+                    <SmartContractCard
+                      web3={web3}
+                      contract={contract}
+                      account={account}
+                      initContract={initContract}
+                      initAccount={initAccount}
+                      contractMethodSendWrapper={contractMethodSendWrapper}
+                    />
+                  ) : null}
+                </div>
+              )}
+            </RimbleTransaction.Consumer>
           </RimbleTransaction>
           <ToastMessage.Provider ref={node => (window.toastProvider = node)} />
         </Box>
