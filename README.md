@@ -1,11 +1,11 @@
 ![Rimble Toast Demo](./_assets/giphy.webp)
 
-# Rimble Toast Demo
+# Rimble toast demo
 This is a starter React dApp that uses the Rimble UI component library to call methods on a smart contract deployed to the Ethereum Rinkeby testnet.
 
 [Live Demo](https://mikelockz.github.io/rimble-toast-demo)
 
-## Instant Start
+## Instant start
 [![Edit web3-react](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/MikeLockz/rimble-toast-demo)
 
 ## Overview
@@ -13,12 +13,12 @@ This is a starter React dApp that uses the Rimble UI component library to call m
 - Wraps common web3 functions for consumption by React components
 - Integrates Rimble UI web3 components with web3 provider
 
-### Reqiurements
+### Requirements
 * [node 9+](https://nodejs.org/en/)
 * [git](https://git-scm.com/downloads)
 * [yarn](https://yarnpkg.com/en/docs/install)
 
-## Quick Start
+## Quick start
 Clone the repo
 ```bash
 git clone https://github.com/MikeLockz/rimble-toast-demo
@@ -40,17 +40,18 @@ yarn develop
 
 Navigate to http://localhost:3000 in your browser
 
-### Modifying Smart Contract
+### Modifying smart contract
 
-The smart contract address and the ABI for the contract are both in the `SmartContract.js` file. Update these constants with your own smart contract details.
+The smart contract address and the application binary interface (ABI) for the contract are both in the `SmartContractCard.js` file. Update these constants with your own smart contract details.
 
 ### Calling methods
 
 The `RimbleWeb3.js` component passes a proper for the `web3.eth.contract.send` method and only needs the smart contract's method name.
 
-### Customize Toast Message Content
+### Customize toast message content
 
-You can customize the toast message content.
+You can customize the toast message content. See Rimble's content guidance for writing toast messages. 
+[Read content guidance] (https://consensys.github.io/rimble-ui/?selectedKind=ToastMessage&selectedStory=ToastMessage&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel) 
 
 ### Lifecycle states
 
