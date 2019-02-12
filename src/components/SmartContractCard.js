@@ -64,24 +64,33 @@ class SmartContractCard extends React.Component {
   // gets the number stored in smart contract storage
   getNumber = ({ ...props }) => {
     const { contract } = this.props;
+    // Call method on smart contract
     try {
-      contract.methods
-        .getCounter()
-        .call()
-        .then(value => {
-          value = Number(value.toString());
-          this.setState({ value });
-        })
-        .catch(error => {
-          // TODO: pass error back up to RimbleTransaction component?
-          console.log(error);
-          this.setState({ error });
+      contract.getCounter((error, result) => {
+        if (error) {
+          window.toastProvider.addMessage("Something?", {
+            message: "Smart contract not returning value. " + error,
+            variant: "failure"
+          });
+          return
+        }
+        
+        // Returns bigNumber with value
+        const value = result.c[0]
+        this.setState({ value })
+
+        window.toastProvider.addMessage("Something?", {
+          message: "Read value from smart contract",
+          variant: "success"
         });
+      })
     } catch (error) {
-      // TODO: pass error back up to RimbleTransaction component?
       console.log("error", error);
+      window.toastProvider.addMessage("Something?", {
+        message: "Unable to call smart contract",
+        variant: "failure"
+      });
     }
-    console.log("got number", this.state.value);
   };
 
   resetCounter = () => {
@@ -93,10 +102,6 @@ class SmartContractCard extends React.Component {
   decrementCounter = () => {
     this.props.contractMethodSendWrapper("decrementCounter");
   };
-
-  // TODO: how to get the lifecycle methods of a transaction to be accessible here?
-
-  // TODO: onTransactionReceipt
 
   componentDidMount() {
     // Init the contract after the web3 provider has been determined

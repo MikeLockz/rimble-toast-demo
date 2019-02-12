@@ -1,5 +1,5 @@
 import React from "react";
-import Web3 from "web3"; // uses latest 1.x.x version
+import Web3 from "web3"; // ^0.20.x version
 
 const RimbleTransactionContext = React.createContext({
   contract: {},
@@ -46,7 +46,7 @@ class RimbleTransaction extends React.Component {
     console.log("creating contract");
     // Create contract on initialized web3 provider with given abi and address
     try {
-      const contract = await new this.state.web3.eth.Contract(abi, address);
+      const contract = this.state.web3.eth.contract(abi).at(address);
       this.setState({ contract });
     } catch (error) {
       console.log("Could not create contract.");
@@ -61,10 +61,9 @@ class RimbleTransaction extends React.Component {
     try {
       // Request account access if needed
       await window.ethereum.enable().then(wallets => {
-        // TODO: should you always grab first address? What use cases would not be first address?
+        // Grab first address from account array
         const account = wallets[0];
         this.setState({ account });
-        console.log("wallet address:", this.state.account);
       });
     } catch (error) {
       // User denied account access...
@@ -88,76 +87,95 @@ class RimbleTransaction extends React.Component {
     const { contract, account } = this.state;
 
     try {
-      contract.methods[contractMethod]()
-        .send({ from: account })
-        .on("transactionHash", hash => {
-          // Submitted to block and received transaction hash
-          console.log(
-            "Transaction sent to block successfully. Result pending."
-          );
-          transaction.status = "pending";
-          this.showTransactionToast(transaction);
+      contract[contractMethod]
+        .sendTransaction({ from: account }, (error, txHash) => {
+          console.log(error, txHash)
+          // send txHash to txCreate function
         })
-        .on("confirmation", (confirmationNumber, receipt) => {
-          const confidenceThreshold = 3;
-          // Somehow determine if this is an already confirmed tx? 10?
-          if (confirmationNumber < confidenceThreshold) {
-            console.log(
-              "Confirmation " +
-                confirmationNumber +
-                ". Threshold for confidence not met."
-            );
-            return;
-          } else if (confirmationNumber > confidenceThreshold) {
-            // TODO: Can you stop listening to these events?
 
-            console.log(
-              "Confirmation " +
-                confirmationNumber +
-                ". Confidence threshold already met."
-            );
-            return;
-          }
+        // .on("transactionHash", hash => {
+        //   // Submitted to block and received transaction hash
+        //   console.log(
+        //     "Transaction sent to block successfully. Result pending."
+        //   );
+        //   transaction.status = "pending";
+        //   this.showTransactionToast(transaction);
+        // })
+        // .on("confirmation", (confirmationNumber, receipt) => {
+        //   const confidenceThreshold = 3;
+        //   // Somehow determine if this is an already confirmed tx? 10?
+        //   if (confirmationNumber < confidenceThreshold) {
+        //     console.log(
+        //       "Confirmation " +
+        //         confirmationNumber +
+        //         ". Threshold for confidence not met."
+        //     );
+        //     return;
+        //   } else if (confirmationNumber > confidenceThreshold) {
+        //     // TODO: Can you stop listening to these events?
 
-          console.log("receipt: ", receipt);
+        //     console.log(
+        //       "Confirmation " +
+        //         confirmationNumber +
+        //         ". Confidence threshold already met."
+        //     );
+        //     return;
+        //   }
 
-          // Update transaction with receipt details
-          transaction = { ...transaction, ...receipt };
+        //   console.log("receipt: ", receipt);
 
-          // Confirmed with receipt
-          console.log("Transaction confirmed.");
-          transaction.status = "confirmed";
+        //   // Update transaction with receipt details
+        //   transaction = { ...transaction, ...receipt };
 
-          this.showTransactionToast(transaction);
+        //   // Confirmed with receipt
+        //   console.log("Transaction confirmed.");
+        //   transaction.status = "confirmed";
 
-          // check the status from result
-          if (receipt.status === true) {
-            console.log("Transaction completed successfully!");
-            transaction.status = "success";
-          } else if (receipt.status === false) {
-            console.log("Transaction reverted due to error.");
-            transaction.status = "error";
-          }
+        //   this.showTransactionToast(transaction);
 
-          this.showTransactionToast(transaction);
-        })
-        .on("receipt", receipt => {
-          // Received receipt
-          console.log("receipt: ", receipt);
-          // TODO: What properties of a receipt should be checked and show a toast?
-        })
-        .on("error", error => {
-          // Errored out
-          console.log(error);
-          transaction.status = "error";
-          this.showTransactionToast(transaction);
-        });
+        //   // check the status from result
+        //   if (receipt.status === true) {
+        //     console.log("Transaction completed successfully!");
+        //     transaction.status = "success";
+        //   } else if (receipt.status === false) {
+        //     console.log("Transaction reverted due to error.");
+        //     transaction.status = "error";
+        //   }
+
+        //   this.showTransactionToast(transaction);
+        // })
+        // .on("receipt", receipt => {
+        //   // Received receipt
+        //   console.log("receipt: ", receipt);
+        //   // TODO: What properties of a receipt should be checked and show a toast?
+        // })
+        // .on("error", error => {
+        //   // Errored out
+        //   console.log(error);
+        //   transaction.status = "error";
+        //   this.showTransactionToast(transaction);
+        // });
     } catch (error) {
       console.log("Error calling method on smart contract.");
       transaction.status = "error";
       this.showTransactionToast(transaction);
     }
   };
+
+  // txCreate
+  // creates a transaction object, decorates with timestamp, sends to txQueue
+
+  // txQueue
+  // holds a collection of transaction objects
+
+  // txProcessor
+  // looks at timestamps on transaction objects, determines if time to txLookup
+
+  // txLookup
+  // returns the results of transaction hash, sends results to txState
+
+  // txStatus
+  // determines the state of a transaction based on properties, calls toast if status changed
 
   showTransactionToast = incomingTransaction => {
     let transaction = {};

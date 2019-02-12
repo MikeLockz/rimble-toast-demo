@@ -1,7 +1,7 @@
 ![Rimble Toast Demo](./_assets/giphy.webp)
 
 # Rimble Toast Demo
-This is a starter React dApp that uses the Rimble UI component library to call methods on a smart contract deployed to the Ethereum Rinkeby testnet.
+This is a starter React dApp that uses the Rimble Design System to call methods on a smart contract deployed to the Ethereum Rinkeby testnet.
 
 [Live Demo](https://mikelockz.github.io/rimble-toast-demo)
 
@@ -9,9 +9,9 @@ This is a starter React dApp that uses the Rimble UI component library to call m
 [![Edit web3-react](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/MikeLockz/rimble-toast-demo)
 
 ## Overview
-- Implements a web3 component library (Rimble UI)
+- Implements a web3 component library (Rimble Design System)
 - Wraps common web3 functions for consumption by React components
-- Integrates Rimble UI web3 components with web3 provider
+- Integrates Rimble Design System web3 components with web3 provider
 
 ### Reqiurements
 * [node 9+](https://nodejs.org/en/)
@@ -64,5 +64,5 @@ This is meant to enhance the existing web3 states and show relevant transaction 
 ## Resources
 * [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 * [web3.js documentation (0.2x.x)](https://github.com/ethereum/wiki/wiki/JavaScript-API)
-* [About Rimble UI](https://rimble.consensys.design/)
+* [About Rimble Design System](https://rimble.consensys.design/)
 * [Remix IDE for deploying smart contracts](https://remix.ethereum.org/)
