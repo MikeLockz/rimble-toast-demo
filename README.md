@@ -1,68 +1,68 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![Rimble Toast Demo](https://media.giphy.com/media/vyat50XjrScwHDLYwE/giphy.gif)
 
-## Available Scripts
+# Rimble Toast Demo
+This is a starter React dApp that uses the Rimble UI component library to call methods on a smart contract deployed to the Ethereum Rinkeby testnet.
 
-In the project directory, you can run:
+[Live Demo](https://mikelockz.github.io/rimble-toast-demo)
 
-### `npm start`
+## Instant Start
+[![Edit web3-react](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/MikeLockz/rimble-toast-demo)
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Overview
+- Implements a web3 component library (Rimble UI)
+- Wraps common web3 functions for consumption by React components
+- Integrates Rimble UI web3 components with web3 provider
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+### Reqiurements
+* [node 9+](https://nodejs.org/en/)
+* [git](https://git-scm.com/downloads)
+* [yarn](https://yarnpkg.com/en/docs/install)
 
-### `npm test`
+## Quick Start
+Clone the repo
+```bash
+git clone https://github.com/MikeLockz/rimble-toast-demo
+```
+Change directories
+```bash
+cd rimble-toast-demo
+```
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Install dependencies
+```bash
+yarn install
+```
 
-### `npm run build`
+Start local server
+```bash
+yarn develop
+```
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Navigate to http://localhost:3000 in your browser
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+### Modifying Smart Contract
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The smart contract address and the ABI for the contract are both in the `SmartContract.js` file. Update these constants with your own smart contract details.
 
-### `npm run eject`
+### Calling methods
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+The `RimbleWeb3.js` component passes a proper for the `web3.eth.contract.send` method and only needs the smart contract's method name.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Customize Toast Message Content
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+You can customize the toast message content.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### Lifecycle states
 
-## Learn More
+This is meant to enhance the existing web3 states and show relevant transaction detail to the user to monitor the progress of the transaction.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+* Start
+* Pending
+* Success
+* Failure
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+## Resources
+* [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+* [web3.js documentation (0.2x.x)](https://github.com/ethereum/wiki/wiki/JavaScript-API)
+* [About Rimble UI](https://rimble.consensys.design/)
+* [Remix IDE for deploying smart contracts](https://remix.ethereum.org/)

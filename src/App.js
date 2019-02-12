@@ -1,373 +1,49 @@
-import React, { Component } from 'react';
-import './App.css';
-import { Card, Heading, Box, Button, OutlineButton, Text, Flex, ToastMessage, ThemeProvider } from 'rimble-ui'
-import Web3 from 'web3' // uses latest 1.x.x version
-import TransactionList from './TransactionList' // uses latest 1.x.x version
-import RimbleWeb3Transaction from './RimbleWeb3Transaction'
-import theme from './theme'
+import React, { Component } from "react";
+import { Box, ToastMessage } from "rimble-ui";
+import SmartContractCard from "./components/SmartContractCard";
+import RimbleWeb3 from "./components/RimbleWeb3";
+import InstructionsCard from "./components/InstructionsCard";
+import TransactionStatusCard from "./components/TransactionStatusCard";
 
 class App extends Component {
-  state = {
-    contract: {},
-    account: {},
-    value: 0,
-    error: null,
-    transactionList: [],
-    connected: false,
-    signedIn: false,
-    walletAddress: '',
-    agreedToTerms: false,
-  }
-
-  initContract = () => {
-    // Instantiate provider (like metamask)
-    const web3 = new Web3(window.web3.currentProvider)
-
-    // Address of the deployed smart contract (from etherscan)
-    const address = "0x0f69f0ac4b92bf0d101b5747eed3fa6b653a36f8"
-
-    // Copied from remix ide
-    var abi = [
-      {
-        "constant": false,
-        "inputs": [],
-        "name": "decrementCounter",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [],
-        "name": "incrementCounter",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [],
-        "name": "reset",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "getCounter",
-        "outputs": [
-          {
-            "name": "",
-            "type": "int256"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      }
-    ];
-
-    console.log('creating contract')
-    const contract = new web3.eth.Contract(abi, address)
-    console.log(contract)
-    this.setState({ contract }, () => {
-      // Wait for setState to finish
-      web3.eth.getAccounts()
-        .then((accounts) => {
-          this.setState({ account: accounts[0] }, () => {
-            // Wait for setState to finish
-            console.log(this.state)
-
-            // Get initial number -> is this possible without account access?
-            this.getNumber()
-          })
-        })
-    })
-  }
-
-  // gets the number stored in smart contract storage
-  getNumber = () => {
-    const { contract, account } = this.state;
-    contract.methods.getCounter().call()
-      .then(value => {
-        value = Number(value.toString())
-        this.setState({ value })
-      })
-      .catch(error => {
-        this.setState({ error })
-      })
-  }
-
-  resetCounter = () => {
-    this.contractMethodSendWrapper('reset')
-  }
-  incrementCounter = () => {
-    this.contractMethodSendWrapper('incrementCounter')
-  }
-  decrementCounter = () => {
-    this.contractMethodSendWrapper('decrementCounter')
-  }
-
-  connectWallet = async () => {
-    if (window.ethereum) {
-      window.web3 = new Web3(window.ethereum);
-      try {
-        // Request account access if needed
-        await window.ethereum.enable().then( (walletAddress) => {
-          console.log('wallet address:', walletAddress);
-          const connected = true
-          // Enable Sign In button
-          this.setState({ connected, walletAddress: walletAddress[0] })
-        });
-        // Acccounts now exposed
-        // window.web3.eth.sendTransaction({/* ... */});
-      } catch (error) {
-          // User denied account access...
-      }
-    }
-    // Legacy dapp browsers...
-    else if (window.web3) {
-      window.web3 = new Web3(window.web3.currentProvider);
-      // Acccounts always exposed
-      window.web3.eth.sendTransaction({/* ... */});
-    }
-    // Non-dapp browsers...
-    else {
-      console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
-    }
-  }
-
-  signMessage = async (message) => {
-    const account = this.state.walletAddress;
-    try {
-      const hexMessage = window.web3.utils.utf8ToHex(message)
-
-      await window.web3.eth.personal.sign(hexMessage, account)
-      
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  addTransaction = (incomingTransaction) => {
-    let transaction = {}
-    transaction.lastUpdated = Date.now()
-    transaction = {...transaction, ...incomingTransaction}
-
-    this.state.transactionList.push(transaction)
-    this.setState({
-      transactionList: this.state.transactionList
-    })
-
-    let toastMeta = this.getTransactionToastMeta(transaction)
-    window.toastProvider.addMessage('Not sure where this appears...', toastMeta)
-  }
-
-  getTransactionToastMeta = (transaction) => {
-    let transactionToastMeta = {}
-    let status = transaction.status
-    let transactionHash = transaction.transactionHash
-
-    switch (status) {
-      case 'started':
-        transactionToastMeta = {
-          message: 'Started a new transaction',
-          actionHref: '',
-          actionText: '',
-          variant: 'default',
-          icon: 'InfoOutline',
-        }
-        break;
-      case 'pending':
-        transactionToastMeta = {
-          message: 'Transaction is pending',
-          actionHref: '',
-          actionText: '',
-          variant: 'processing',
-        }
-        break;
-      case 'confirmed':
-        transactionToastMeta = {
-          message: 'Transaction is confirmed',
-          actionHref: 'https://rinkeby.etherscan.io/tx/' + transactionHash,
-          actionText: 'View on Etherscan',
-          variant: 'success',
-        }
-        break;
-      case 'success':
-        transactionToastMeta = {
-          message: 'Transaction completed successfully',
-          actionHref: 'https://rinkeby.etherscan.io/tx/' + transactionHash,
-          actionText: 'View on Etherscan',
-          variant: 'success',
-        }
-        break;
-      case 'error':
-        transactionToastMeta = {
-          message: 'Error',
-          actionHref: 'https://rinkeby.etherscan.io/tx/' + transactionHash,
-          actionText: 'View on Etherscan',
-          variant: 'failure',
-        }
-        break;
-      default:
-        break;
-    }
-    return transactionToastMeta
-  }
-
-  contractMethodSendWrapper = (contractMethod) => {
-    let transaction = {}
-    transaction.created = Date.now();
-    
-    // Show toast for starting transaction
-    console.log("Starting Transaction");
-    transaction.status = 'started'
-    this.addTransaction(transaction)
-
-    const { contract, account } = this.state
-
-    contract.methods[contractMethod]().send({ from: account })
-      .on('transactionHash', (hash) => {
-        // Submitted to block and received transaction hash
-        console.log("Transaction sent to block successfully. Result pending.");
-        transaction.status = 'pending'
-        this.addTransaction(transaction)
-      })
-      .on('confirmation', (confirmationNumber, receipt) => {
-        
-        // Somehow determine if this is an already confirmed tx?
-        if (confirmationNumber > 0) {
-          return;
-        }
-
-        console.log("receipt: ", receipt)
-        
-        // Update transaction with receipt details
-        transaction = { ...transaction, ...receipt }
-        
-        // Confirmed with receipt
-        console.log("Transaction confirmed.");
-        transaction.status = "confirmed"
-        
-        this.addTransaction(transaction)
-
-        // check the status from result
-        if (receipt.status === true) {
-          console.log("Transaction completed successfully!");
-          transaction.status = 'success'
-        } else if (receipt.status === false) {
-          console.log("Transaction reverted due to error.");
-          transaction.status = 'error'
-        }
-
-        this.addTransaction(transaction)
-
-        
-      })
-      .on('receipt', (receipt) => {
-        // Received receipt
-        console.log("receipt: ", receipt);
-
-        // Update value
-        this.getNumber();
-      })
-      .on('error', (error) => {
-        // Errored out
-        console.log(error);
-      })
-  }
-
-  connectToWallet = () => {
-
-  }
-
-  agreetoToS = () => {
-    const message = `Terms of Service`
-
-    this.signMessage(message).then((response) => {
-      console.log('agreed to ToS', response)
-
-      this.setState({
-        agreedToTerms: true,
-      })
-    })
-  }
-
-  createAccount = () => {
-    const message = `Sign in with most recent nonce: ${Date.now()}`
-
-    this.signMessage(message).then((err, response) => {
-      if (!err) {
-        this.setState({
-          signedIn: true
-        })
-      }
-    })
-  }
-
-  componentDidMount() {
-    this.initContract()
-  }
-
   render() {
     return (
-      <ThemeProvider theme={theme}>
-        <div className="App">
-          <Box my={'auto'}>
-            <Card width={'600px'} mx={'auto'} px={4}>
-              <Heading.h1 fontSize={5} textAlign={'center'} px={4} mb={5}>Smart Contract Toast Example</Heading.h1>
-              <Box>
-                <Box py={4}>
-                  <Text mb={2} fontSize={3}>
-                    Value from smart contract:
-                  </Text>
-                  <Text fontSize={6} textAlign={'center'}>{this.state.value}</Text> {/* Number will always come in  */}
-                </Box>
+      <div className="App">
+        <Box my={"auto"}>
+          <RimbleWeb3>
+            <RimbleWeb3.Consumer>
+              {({
+                web3,
+                contract,
+                account,
+                initContract,
+                initAccount,
+                contractMethodSendWrapper
+              }) => (
+                <div>
+                  {/* Conditionally render child comonents dependent on web3 being loaded */}
+                  {web3 ? (
+                    <div>
+                      <SmartContractCard
+                        contract={contract}
+                        account={account}
+                        initContract={initContract}
+                        initAccount={initAccount}
+                        contractMethodSendWrapper={contractMethodSendWrapper}
+                      />
+                      {/* FUTURE: We need to make sure multiple components can consume a transaction's status */}
+                      {/* <TransactionStatusCard /> */}
+                    </div>
+                  ) : null}
+                </div>
+              )}
+            </RimbleWeb3.Consumer>
+          </RimbleWeb3>
+          <ToastMessage.Provider ref={node => (window.toastProvider = node)} />
+        </Box>
 
-                <Flex borderTop={1} borderColor={'#E8E8E8'} justifyContent='space-between' py={4} >
-                  <Button onClick={this.connectWallet} disabled={this.state.connected} mr={4}>Connect</Button>
-                  <Button onClick={this.agreetoToS} disabled={!this.state.connected || this.state.agreedToTerms} mr={4}>Agree to terms</Button>
-                  <Button onClick={this.createAccount} disabled={!this.state.agreedToTerms || this.state.signedIn}>Sign In</Button>
-                </Flex>
-
-                <Flex px={0} pt={4} borderTop={1} borderColor={'#E8E8E8'} justifyContent='space-between'>
-                  <OutlineButton size={'medium'} onClick={this.resetCounter} mr={4} disabled={!this.state.signedIn }>Reset</OutlineButton>
-                  <OutlineButton size={'medium'} onClick={this.incrementCounter} mr={4} disabled={!this.state.signedIn }>Increment</OutlineButton>
-                  <OutlineButton size={'medium'} onClick={this.decrementCounter} disabled={!this.state.signedIn }>Decrement</OutlineButton>
-                </Flex>
-              </Box>
-            </Card>
-
-            <Card width={'600px'} mx={'auto'} px={4}>
-              <Box>
-                <p>Instructions:</p>
-                <ul>
-                  <li>Make sure MetaMask is working in your browser</li>
-                  <li>Set the network to Rinkeby Test Network</li>
-                  <li>You'll need a little bit of eth for gas fees</li>
-                </ul>
-                
-                <p>About</p>
-                <p>This is an example of a webapp that interacts with a Smart Contract. The demo uses Web3.js and Rimble UI Components to show the status of a Smart Contract transaction via toast messages. </p>
-
-              </Box>
-            </Card>
-
-            <ToastMessage.Provider ref={(node) => (window.toastProvider = node)} />
-          </Box>
-        </div>
-      </ThemeProvider>
+        <InstructionsCard />
+      </div>
     );
   }
 }
