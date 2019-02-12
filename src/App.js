@@ -3,7 +3,6 @@ import { Box, ToastMessage } from "rimble-ui";
 import SmartContractCard from "./components/SmartContractCard";
 import RimbleWeb3 from "./components/RimbleWeb3";
 import InstructionsCard from "./components/InstructionsCard";
-import TransactionStatusCard from "./components/TransactionStatusCard";
 
 class App extends Component {
   render() {
