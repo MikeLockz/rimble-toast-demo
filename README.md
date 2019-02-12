@@ -1,4 +1,4 @@
-![Rimble Toast Demo](https://media.giphy.com/media/vyat50XjrScwHDLYwE/giphy.gif)
+![Rimble Toast Demo](./_assets/giphy.webp)
 
 # Rimble Toast Demo
 This is a starter React dApp that uses the Rimble UI component library to call methods on a smart contract deployed to the Ethereum Rinkeby testnet.
