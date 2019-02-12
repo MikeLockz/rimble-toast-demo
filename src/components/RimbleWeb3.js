@@ -1,5 +1,6 @@
 import React from "react";
 import Web3 from "web3"; // uses latest 1.x.x version
+import myObject from "../lib/webpack-library-starter"
 
 const RimbleTransactionContext = React.createContext({
   contract: {},
@@ -15,6 +16,8 @@ class RimbleTransaction extends React.Component {
 
   // Initialize a web3 provider
   initWeb3 = async () => {
+    console.log(myObject.name)
+    
     let web3 = {};
 
     // Check for modern web3 provider
