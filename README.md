@@ -51,7 +51,7 @@ The `RimbleWeb3.js` component passes a proper for the `web3.eth.contract.send` m
 ### Customize toast message content
 
 You can customize the toast message content. See Rimble's content guidance for writing toast messages. 
-[Read content guidance] (https://consensys.github.io/rimble-ui/?selectedKind=ToastMessage&selectedStory=ToastMessage&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel) 
+[Read content guidance](https://consensys.github.io/rimble-ui/?selectedKind=ToastMessage&selectedStory=ToastMessage&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel) 
 
 ### Lifecycle states
 
