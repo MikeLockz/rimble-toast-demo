@@ -61,7 +61,6 @@ class RimbleTransaction extends React.Component {
     try {
       // Request account access if needed
       await window.ethereum.enable().then(wallets => {
-        // TODO: should you always grab first address? What use cases would not be first address?
         const account = wallets[0];
         this.setState({ account });
         console.log("wallet address:", this.state.account);
@@ -99,6 +98,8 @@ class RimbleTransaction extends React.Component {
           this.showTransactionToast(transaction);
         })
         .on("confirmation", (confirmationNumber, receipt) => {
+          console.log("receipt: ", receipt, "confirmation number: ", confirmationNumber);
+
           const confidenceThreshold = 3;
           // Somehow determine if this is an already confirmed tx? 10?
           if (confirmationNumber < confidenceThreshold) {
@@ -108,9 +109,18 @@ class RimbleTransaction extends React.Component {
                 ". Threshold for confidence not met."
             );
             return;
-          } else if (confirmationNumber > confidenceThreshold) {
-            // TODO: Can you stop listening to these events?
+          } else if (confirmationNumber === confidenceThreshold) {
+            // check the status from result
+            if (receipt.status === true) {
+              console.log("Transaction completed successfully!");
+              transaction.status = "success";
+            } else if (receipt.status === false) {
+              console.log("Transaction reverted due to error.");
+              transaction.status = "error";
+            }
 
+            this.showTransactionToast(transaction);
+          } else if (confirmationNumber > confidenceThreshold) {
             console.log(
               "Confirmation " +
                 confirmationNumber +
@@ -118,26 +128,13 @@ class RimbleTransaction extends React.Component {
             );
             return;
           }
-
-          console.log("receipt: ", receipt);
-
+          
           // Update transaction with receipt details
           transaction = { ...transaction, ...receipt };
 
           // Confirmed with receipt
           console.log("Transaction confirmed.");
           transaction.status = "confirmed";
-
-          this.showTransactionToast(transaction);
-
-          // check the status from result
-          if (receipt.status === true) {
-            console.log("Transaction completed successfully!");
-            transaction.status = "success";
-          } else if (receipt.status === false) {
-            console.log("Transaction reverted due to error.");
-            transaction.status = "error";
-          }
 
           this.showTransactionToast(transaction);
         })

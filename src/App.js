@@ -9,7 +9,6 @@ class App extends Component {
   render() {
     return (
       <ThemeProvider theme={theme} className="App">
-        <Box my={"auto"}>
           <RimbleWeb3>
             <RimbleWeb3.Consumer>
               {({
@@ -23,25 +22,21 @@ class App extends Component {
                 <div>
                   {/* Conditionally render child comonents dependent on web3 being loaded */}
                   {web3 ? (
-                    <div>
-                      <SmartContractCard
-                        contract={contract}
-                        account={account}
-                        initContract={initContract}
-                        initAccount={initAccount}
-                        contractMethodSendWrapper={contractMethodSendWrapper}
-                      />
-                      {/* FUTURE: We need to make sure multiple components can consume a transaction's status */}
-                      {/* <TransactionStatusCard /> */}
-                    </div>
-                  ) : null}
+                    <SmartContractCard
+                      contract={contract}
+                      account={account}
+                      initContract={initContract}
+                      initAccount={initAccount}
+                      contractMethodSendWrapper={contractMethodSendWrapper}
+                    />
+                  ) : (
+                    <div>Are you sure you have metamask installed?</div>
+                  )}
                 </div>
               )}
             </RimbleWeb3.Consumer>
           </RimbleWeb3>
           <ToastMessage.Provider ref={node => (window.toastProvider = node)} />
-        </Box>
-
         <InstructionsCard />
       </ThemeProvider>
     );
