@@ -181,7 +181,7 @@ class RimbleTransaction extends React.Component {
     switch (status) {
       case "started":
         transactionToastMeta = {
-          message: "Started a new transaction",
+          message: "Confirm your transaction in MetaMask",
           actionHref: "",
           actionText: "",
           variant: "default",
@@ -190,7 +190,8 @@ class RimbleTransaction extends React.Component {
         break;
       case "pending":
         transactionToastMeta = {
-          message: "Transaction is pending",
+          message: "Transaction pending",
+          secondarymessage: "Waiting for the network to confirm your transaction",
           actionHref: "",
           actionText: "",
           variant: "processing"
@@ -198,23 +199,23 @@ class RimbleTransaction extends React.Component {
         break;
       case "confirmed":
         transactionToastMeta = {
-          message: "Transaction is confirmed",
+          message: "Transaction confirmed",
+          secondarymessage: "Your transaction is in progress",
           actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
-          actionText: "View on Etherscan",
+          actionText: "Check status",
           variant: "success"
         };
         break;
       case "success":
         transactionToastMeta = {
-          message: "Transaction completed successfully",
-          actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
-          actionText: "View on Etherscan",
+          message: "Transaction completed",
           variant: "success"
         };
         break;
       case "error":
         transactionToastMeta = {
-          message: "Error",
+          message: "Transaction failed",
+          secondarymessage: "Make sure you have enough Ether (ETH) and try again",
           actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
           actionText: "View on Etherscan",
           variant: "failure"
