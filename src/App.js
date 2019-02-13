@@ -1,13 +1,14 @@
 import React, { Component } from "react";
-import { Box, ToastMessage } from "rimble-ui";
+import { ThemeProvider, Box, ToastMessage } from "rimble-ui";
 import SmartContractCard from "./components/SmartContractCard";
 import RimbleWeb3 from "./components/RimbleWeb3";
 import InstructionsCard from "./components/InstructionsCard";
+import theme from "./theme"
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
+      <ThemeProvider theme={theme} className="App">
         <Box my={"auto"}>
           <RimbleWeb3>
             <RimbleWeb3.Consumer>
@@ -42,7 +43,7 @@ class App extends Component {
         </Box>
 
         <InstructionsCard />
-      </div>
+      </ThemeProvider>
     );
   }
 }
