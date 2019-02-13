@@ -5,6 +5,7 @@ const RimbleTransactionContext = React.createContext({
   contract: {},
   account: {},
   web3: {},
+  transactions: {},
   initWeb3: () => {},
   initContract: () => {},
   initAccount: () => {}
@@ -77,12 +78,10 @@ class RimbleTransaction extends React.Component {
   };
 
   contractMethodSendWrapper = contractMethod => {
-    let transaction = {};
-    transaction.created = Date.now();
+    let transaction = this.createTransaction();
 
     // Show toast for starting transaction
     console.log("Starting Transaction");
-    transaction.status = "started";
     this.showTransactionToast(transaction);
 
     const { contract, account } = this.state;
@@ -92,14 +91,28 @@ class RimbleTransaction extends React.Component {
         .send({ from: account })
         .on("transactionHash", hash => {
           // Submitted to block and received transaction hash
-          console.log(
-            "Transaction sent to block successfully. Result pending."
-          );
+          console.log("Transaction hash generated.");
+
+          // Set properties on the current transaction
+          transaction.hash = hash;
           transaction.status = "pending";
+
+          // Add transaction to the collection
+          this.addTransaction(hash, transaction);
+
+          // Show user current status
           this.showTransactionToast(transaction);
         })
         .on("confirmation", (confirmationNumber, receipt) => {
+          // Confirmed with receipt
+          console.log("confirmation receipt: ", receipt);
+
+          // Set properties on the current transaction
+          transaction.confirmations = confirmationNumber;
+
+          // Must receive this many confirmations before showing confirmation toast
           const confidenceThreshold = 3;
+
           // Somehow determine if this is an already confirmed tx? 10?
           if (confirmationNumber < confidenceThreshold) {
             console.log(
@@ -107,38 +120,20 @@ class RimbleTransaction extends React.Component {
                 confirmationNumber +
                 ". Threshold for confidence not met."
             );
-            return;
+          } else if (confirmationNumber === confidenceThreshold) {
+            console.log("Transaction confirmed.");
+            this.determineTransactionStatus(receipt, transaction);
           } else if (confirmationNumber > confidenceThreshold) {
-            // TODO: Can you stop listening to these events?
-
             console.log(
               "Confirmation " +
                 confirmationNumber +
                 ". Confidence threshold already met."
             );
-            return;
           }
-
-          console.log("receipt: ", receipt);
 
           // Update transaction with receipt details
-          transaction = { ...transaction, ...receipt };
-
-          // Confirmed with receipt
-          console.log("Transaction confirmed.");
-          transaction.status = "confirmed";
-
-          this.showTransactionToast(transaction);
-
-          // check the status from result
-          if (receipt.status === true) {
-            console.log("Transaction completed successfully!");
-            transaction.status = "success";
-          } else if (receipt.status === false) {
-            console.log("Transaction reverted due to error.");
-            transaction.status = "error";
-          }
-
+          //transaction = { ...transaction, ...receipt };
+          this.updateTransaction(transaction.hash, transaction);
           this.showTransactionToast(transaction);
         })
         .on("receipt", receipt => {
@@ -157,6 +152,47 @@ class RimbleTransaction extends React.Component {
       transaction.status = "error";
       this.showTransactionToast(transaction);
     }
+  };
+
+  // Create tx
+  createTransaction = () => {
+    let transaction = {};
+    transaction.created = Date.now();
+    transaction.status = "started";
+
+    return transaction;
+  };
+
+  addTransaction = (hash, transaction) => {
+    const transactions = { ...this.props.transactions };
+
+    transactions[hash] = transaction;
+    this.setState({ transaction });
+  };
+
+  // Add/update transaction in state
+  updateTransaction = (hash, updatedTransaction) => {
+    const transactions = { ...this.props.transactions };
+
+    transactions[hash] = updatedTransaction;
+    this.setState({ transactions });
+  };
+
+  // Pass transactions to context
+
+  // On all tranasction status changes, run tx through decorator
+
+  // Check the status from receipt of transaction
+  determineTransactionStatus = (receipt, transaction) => {
+    if (receipt.status === true) {
+      console.log("Transaction completed successfully!");
+      transaction.status = "success";
+    } else if (receipt.status === false) {
+      console.log("Transaction reverted due to error.");
+      transaction.status = "error";
+    }
+
+    this.showTransactionToast(transaction);
   };
 
   showTransactionToast = incomingTransaction => {
@@ -230,6 +266,7 @@ class RimbleTransaction extends React.Component {
     contract: {},
     account: null,
     web3: null,
+    transactions: {},
     initWeb3: this.initWeb3,
     initContract: this.initContract,
     initAccount: this.initAccount,

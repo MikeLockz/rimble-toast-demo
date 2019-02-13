@@ -94,10 +94,6 @@ class SmartContractCard extends React.Component {
     this.props.contractMethodSendWrapper("decrementCounter");
   };
 
-  // TODO: how to get the lifecycle methods of a transaction to be accessible here?
-
-  // TODO: onTransactionReceipt
-
   componentDidMount() {
     // Init the contract after the web3 provider has been determined
     this.props.initContract(contractAddress, contractAbi).then(() => {

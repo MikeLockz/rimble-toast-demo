@@ -3,6 +3,7 @@ import { Box, ToastMessage } from "rimble-ui";
 import SmartContractCard from "./components/SmartContractCard";
 import RimbleWeb3 from "./components/RimbleWeb3";
 import InstructionsCard from "./components/InstructionsCard";
+import TransactionsCard from "./components/TransactionsCard";
 
 class App extends Component {
   render() {
@@ -15,6 +16,7 @@ class App extends Component {
                 web3,
                 contract,
                 account,
+                transactions,
                 initContract,
                 initAccount,
                 contractMethodSendWrapper
@@ -31,7 +33,7 @@ class App extends Component {
                         contractMethodSendWrapper={contractMethodSendWrapper}
                       />
                       {/* FUTURE: We need to make sure multiple components can consume a transaction's status */}
-                      {/* <TransactionStatusCard /> */}
+                      <TransactionsCard transactions={transactions} />
                     </div>
                   ) : null}
                 </div>
