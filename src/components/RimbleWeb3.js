@@ -32,10 +32,7 @@ class RimbleTransaction extends React.Component {
       console.log(
         "Non-Ethereum browser detected. You should consider trying MetaMask!"
       );
-      window.toastProvider.addMessage("Something?", {
-        message: "No wallet available. Unable to continue.",
-        variant: "failure"
-      });
+      
       web3 = false;
     }
 

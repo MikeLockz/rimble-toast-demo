@@ -73,12 +73,10 @@ class SmartContractCard extends React.Component {
           this.setState({ value });
         })
         .catch(error => {
-          // TODO: pass error back up to RimbleTransaction component?
           console.log(error);
           this.setState({ error });
         });
     } catch (error) {
-      // TODO: pass error back up to RimbleTransaction component?
       console.log("error", error);
     }
     console.log("got number", this.state.value);
@@ -87,16 +85,14 @@ class SmartContractCard extends React.Component {
   resetCounter = () => {
     this.props.contractMethodSendWrapper("reset");
   };
+
   incrementCounter = () => {
     this.props.contractMethodSendWrapper("incrementCounter");
   };
+
   decrementCounter = () => {
     this.props.contractMethodSendWrapper("decrementCounter");
   };
-
-  // TODO: how to get the lifecycle methods of a transaction to be accessible here?
-
-  // TODO: onTransactionReceipt
 
   componentDidMount() {
     // Init the contract after the web3 provider has been determined

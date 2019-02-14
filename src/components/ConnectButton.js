@@ -1,17 +1,17 @@
 import React from "react";
-import { Button } from "rimble-ui";
+import { MetaMaskButton } from "rimble-ui";
 
 class ConnectButton extends React.Component {
   render() {
     return (
-      <Button
+      <MetaMaskButton
         size={"medium"}
         mr={4}
         onClick={this.props.initAccount}
         disabled={this.props.account}
       >
-        Connect
-      </Button>
+        Connect with MetaMask
+      </MetaMaskButton>
     );
   }
 }
