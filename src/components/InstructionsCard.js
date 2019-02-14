@@ -10,7 +10,7 @@ class InstructionsCard extends React.Component {
           <ul>
             <li>Make sure MetaMask is working in your browser</li>
             <li>Set the network to Rinkeby Test Network</li>
-            <li>You'll need a little bit of eth for gas fees</li>
+            <li>You'll need a little bit of ETH for gas fees</li>
           </ul>
 
           <p>About</p>
