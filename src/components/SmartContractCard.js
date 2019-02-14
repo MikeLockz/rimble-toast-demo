@@ -115,7 +115,7 @@ class SmartContractCard extends React.Component {
         <Box>
           <Box py={4}>
             <Text mb={2} fontSize={3}>
-              Value from smart contract:
+              Smart contract value
             </Text>
             <Text fontSize={6} textAlign={"center"}>
               {this.state.value}
@@ -149,7 +149,7 @@ class SmartContractCard extends React.Component {
               onClick={this.incrementCounter}
               disabled={!this.props.account}
             >
-              Increment
+              Increase value
             </OutlineButton>
 
             <OutlineButton
@@ -157,7 +157,7 @@ class SmartContractCard extends React.Component {
               onClick={this.decrementCounter}
               disabled={!this.props.account}
             >
-              Decrement
+              Decrease value
             </OutlineButton>
           </Flex>
         </Box>
