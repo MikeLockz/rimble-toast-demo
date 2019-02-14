@@ -141,7 +141,6 @@ class RimbleTransaction extends React.Component {
         .on("receipt", receipt => {
           // Received receipt
           console.log("receipt: ", receipt);
-          // TODO: What properties of a receipt should be checked and show a toast?
         })
         .on("error", error => {
           // Errored out
@@ -174,7 +173,6 @@ class RimbleTransaction extends React.Component {
     let status = transaction.status;
     let transactionHash = transaction.transactionHash;
 
-    // TODO: Move this into external file and import
     switch (status) {
       case "started":
         transactionToastMeta = {
