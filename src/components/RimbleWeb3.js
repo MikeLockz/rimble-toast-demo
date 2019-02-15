@@ -115,12 +115,13 @@ class RimbleTransaction extends React.Component {
                 ". Threshold for confidence not met."
             );
             return;
-          } else if (confirmationNumber === confidenceThreshold - 1) {
-            // check the status from result
-            if (receipt.status === true) {
+          } else if (confirmationNumber === confidenceThreshold) {
+            console.log("Confidence threshold met.");
+            // check the status from result since we are confident in the result
+            if (receipt.status) {
               console.log("Transaction completed successfully!");
               transaction.status = "success";
-            } else if (receipt.status === false) {
+            } else if (!receipt.status) {
               console.log("Transaction reverted due to error.");
               transaction.status = "error";
             }
@@ -174,7 +175,7 @@ class RimbleTransaction extends React.Component {
     switch (status) {
       case "started":
         transactionToastMeta = {
-          message: "Value change submitted",
+          message: "Change submitted",
           secondaryMessage: "Confirm in MetaMask",
           actionHref: "",
           actionText: "",
@@ -184,8 +185,8 @@ class RimbleTransaction extends React.Component {
         break;
       case "pending":
         transactionToastMeta = {
-          message: "Verifying change",
-          secondaryMessage: "Sending change to the network",
+          message: "Processing change...",
+          secondaryMessage: "This may take a few minutes",
           actionHref: "",
           actionText: "",
           variant: "processing"
@@ -193,8 +194,8 @@ class RimbleTransaction extends React.Component {
         break;
       case "confirmed":
         transactionToastMeta = {
-          message: "Confirmed in MetaMask",
-          secondaryMessage: "This might take a few minutes",
+          message: "First block confirmed",
+          secondaryMessage: "Your change is in progress",
           actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
           actionText: "Check progress",
           variant: "processing"
