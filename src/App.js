@@ -22,7 +22,7 @@ class App extends Component {
       <ThemeProvider theme={theme} className="App">
         <Header />
         <Flex justifyContent="center" p={4}>
-          <Text width="600px">
+          <Text width="400px">
             This is a starter React dApp that uses the Rimble UI component
             library to call methods on a smart contract deployed to the Ethereum
             Rinkeby testnet.

@@ -6,7 +6,7 @@ import SmartContractControls from "./SmartContractControls";
 class PrimaryCard extends React.Component {
   render() {
     return (
-      <Card width={"600px"} mx={"auto"} px={4}>
+      <Card width={"400px"} mx={"auto"} px={4}>
         {!this.props.account ? (
           <ConnectButton
             initAccount={this.props.initAccount}
