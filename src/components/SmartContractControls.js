@@ -1,6 +1,5 @@
 import React from "react";
-import { Card, Heading, Box, Text, Flex, OutlineButton } from "rimble-ui";
-import ConnectButton from "./ConnectButton";
+import { Flex, Box, Text, Button, OutlineButton } from "rimble-ui";
 
 // Address of the deployed smart contract (from etherscan)
 const contractAddress = "0x0f69f0ac4b92bf0d101b5747eed3fa6b653a36f8";
@@ -56,7 +55,7 @@ const contractAbi = [
   }
 ];
 
-class SmartContractCard extends React.Component {
+class SmartContractControls extends React.Component {
   state = {
     value: 0
   };
@@ -79,7 +78,6 @@ class SmartContractCard extends React.Component {
     } catch (error) {
       console.log("error", error);
     }
-    console.log("got number", this.state.value);
   };
 
   resetCounter = () => {
@@ -104,62 +102,52 @@ class SmartContractCard extends React.Component {
 
   render() {
     return (
-      <Card width={"600px"} mx={"auto"} px={4}>
-        <Heading.h1 fontSize={5} textAlign={"center"} px={4} mb={5}>
-          Rimble Smart Contract Example
-        </Heading.h1>
-        <Box>
-          <Box py={4}>
-            <Text mb={2} fontSize={3}>
-              Smart contract value
-            </Text>
-            <Text fontSize={6} textAlign={"center"}>
-              {this.state.value}
-            </Text>
-          </Box>
+      <Box>
+        <Flex
+          px={0}
+          pb={4}
+          borderBottom={1}
+          borderColor={"#E8E8E8"}
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Text mb={2} fontSize={3}>
+            Smart contract value
+          </Text>
 
-          <Flex
-            px={0}
-            pt={4}
-            borderTop={1}
-            borderColor={"#E8E8E8"}
-            justifyContent="space-between"
+          <OutlineButton
+            size={"medium"}
+            onClick={this.resetCounter}
+            disabled={!this.props.account}
           >
-            <ConnectButton
-              initAccount={this.props.initAccount}
-              account={this.props.account}
-            />
+            Reset
+          </OutlineButton>
+        </Flex>
 
-            <OutlineButton
-              size={"medium"}
-              mr={4}
-              onClick={this.resetCounter}
-              disabled={!this.props.account}
-            >
-              Reset
-            </OutlineButton>
-
-            <OutlineButton
-              size={"medium"}
-              mr={4}
-              onClick={this.incrementCounter}
-              disabled={!this.props.account}
-            >
-              Increase value
-            </OutlineButton>
-
-            <OutlineButton
-              size={"medium"}
-              onClick={this.decrementCounter}
-              disabled={!this.props.account}
-            >
-              Decrease value
-            </OutlineButton>
-          </Flex>
+        <Box py={4}>
+          <Text fontSize={6} textAlign={"center"}>
+            {this.state.value}
+          </Text>
         </Box>
-      </Card>
+
+        <Flex
+          px={0}
+          pt={4}
+          borderTop={1}
+          borderColor={"#E8E8E8"}
+          justifyContent="space-between"
+        >
+          <Button size={"medium"} mr={4} onClick={this.incrementCounter}>
+            Increase value
+          </Button>
+
+          <Button size={"medium"} onClick={this.decrementCounter}>
+            Decrease value
+          </Button>
+        </Flex>
+      </Box>
     );
   }
 }
 
-export default SmartContractCard;
+export default SmartContractControls;

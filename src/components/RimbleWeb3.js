@@ -32,7 +32,7 @@ class RimbleTransaction extends React.Component {
       console.log(
         "Non-Ethereum browser detected. You should consider trying MetaMask!"
       );
-      
+
       web3 = false;
     }
 
@@ -47,8 +47,7 @@ class RimbleTransaction extends React.Component {
       this.setState({ contract });
     } catch (error) {
       console.log("Could not create contract.");
-      window.toastProvider.addMessage("Something?", {
-        message: "Contract creation failed.",
+      window.toastProvider.addMessage("Contract creation failed.", {
         variant: "failure"
       });
     }
@@ -65,8 +64,7 @@ class RimbleTransaction extends React.Component {
     } catch (error) {
       // User denied account access...
       console.log("error:", error);
-      window.toastProvider.addMessage("Something?", {
-        message: "User needs to CONNECT wallet",
+      window.toastProvider.addMessage("User needs to CONNECT wallet", {
         variant: "failure"
       });
     }
@@ -95,18 +93,29 @@ class RimbleTransaction extends React.Component {
           this.showTransactionToast(transaction);
         })
         .on("confirmation", (confirmationNumber, receipt) => {
-          console.log("receipt: ", receipt, "confirmation number: ", confirmationNumber);
-
+          console.log(
+            "receipt: ",
+            receipt,
+            "confirmation number: ",
+            confirmationNumber
+          );
+          // How many confirmations should be received before informing the user
           const confidenceThreshold = 3;
-          // Somehow determine if this is an already confirmed tx? 10?
-          if (confirmationNumber < confidenceThreshold) {
+
+          if (confirmationNumber === 0) {
+            // Initial confirmation receipt
+            console.log("Transaction confirmed.");
+            transaction.status = "confirmed";
+
+            this.showTransactionToast(transaction);
+          } else if (confirmationNumber < confidenceThreshold) {
             console.log(
               "Confirmation " +
                 confirmationNumber +
                 ". Threshold for confidence not met."
             );
             return;
-          } else if (confirmationNumber === confidenceThreshold) {
+          } else if (confirmationNumber === confidenceThreshold - 1) {
             // check the status from result
             if (receipt.status === true) {
               console.log("Transaction completed successfully!");
@@ -117,6 +126,7 @@ class RimbleTransaction extends React.Component {
             }
 
             this.showTransactionToast(transaction);
+            return;
           } else if (confirmationNumber > confidenceThreshold) {
             console.log(
               "Confirmation " +
@@ -125,15 +135,6 @@ class RimbleTransaction extends React.Component {
             );
             return;
           }
-          
-          // Update transaction with receipt details
-          transaction = { ...transaction, ...receipt };
-
-          // Confirmed with receipt
-          console.log("Transaction confirmed.");
-          transaction.status = "confirmed";
-
-          this.showTransactionToast(transaction);
         })
         .on("receipt", receipt => {
           // Received receipt
@@ -162,7 +163,7 @@ class RimbleTransaction extends React.Component {
     let toastMeta = this.getTransactionToastMeta(transaction);
 
     // Show toast
-    window.toastProvider.addMessage("...", toastMeta);
+    window.toastProvider.addMessage(".", toastMeta);
   };
 
   getTransactionToastMeta = transaction => {
@@ -174,7 +175,7 @@ class RimbleTransaction extends React.Component {
       case "started":
         transactionToastMeta = {
           message: "Value change submitted",
-          secondarymessage: "Confirm in MetaMask",
+          secondaryMessage: "Confirm in MetaMask",
           actionHref: "",
           actionText: "",
           variant: "default",
@@ -183,8 +184,8 @@ class RimbleTransaction extends React.Component {
         break;
       case "pending":
         transactionToastMeta = {
-          message: "Confirmed in MetaMask",
-          secondarymessage: "Sending change to the network",
+          message: "Verifying change",
+          secondaryMessage: "Sending change to the network",
           actionHref: "",
           actionText: "",
           variant: "processing"
@@ -192,8 +193,8 @@ class RimbleTransaction extends React.Component {
         break;
       case "confirmed":
         transactionToastMeta = {
-          message: "Verifying change",
-          secondarymessage: "This might take a few minutes",
+          message: "Confirmed in MetaMask",
+          secondaryMessage: "This might take a few minutes",
           actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
           actionText: "Check progress",
           variant: "processing"
@@ -208,7 +209,8 @@ class RimbleTransaction extends React.Component {
       case "error":
         transactionToastMeta = {
           message: "Value change failed",
-          secondarymessage: "Make sure you have enough Ether (ETH) and try again",
+          secondarymessage:
+            "Make sure you have enough Ether (ETH) and try again",
           actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
           actionText: "View on Etherscan",
           variant: "failure"
