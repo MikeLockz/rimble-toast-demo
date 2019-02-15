@@ -31,27 +31,10 @@ class App extends Component {
 
         <RimbleWeb3>
           <RimbleWeb3.Consumer>
-            {({
-              web3,
-              contract,
-              account,
-              initContract,
-              initAccount,
-              contractMethodSendWrapper
-            }) => (
+            {({ web3 }) => (
               <Box>
                 {/* Conditionally render child comonents dependent on web3 being loaded */}
-                {!web3 ? (
-                  <MissingWeb3Provider />
-                ) : (
-                  <PrimaryCard
-                    contract={contract}
-                    account={account}
-                    initContract={initContract}
-                    initAccount={initAccount}
-                    contractMethodSendWrapper={contractMethodSendWrapper}
-                  />
-                )}
+                {!web3 ? <MissingWeb3Provider /> : <PrimaryCard />}
               </Box>
             )}
           </RimbleWeb3.Consumer>
