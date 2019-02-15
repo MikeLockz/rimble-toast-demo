@@ -4,11 +4,11 @@
 
 This is a starter React dApp that uses the Rimble UI component library to call methods on a smart contract deployed to the Ethereum Rinkeby testnet.
 
-[Live Demo](https://consensys.github.io/rimble-app-demo)
+[Live Demo](https://mikelockz.github.io/rimble-toast-demo)
 
 ## Instant start
 
-[![Edit web3-react](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/ConsenSys/rimble-app-demo)
+[![Edit web3-react](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/MikeLockz/rimble-toast-demo)
 
 ## Overview
 
@@ -27,7 +27,7 @@ This is a starter React dApp that uses the Rimble UI component library to call m
 Clone the repo
 
 ```bash
-git clone https://github.com/ConsenSys/rimble-app-demo
+git clone https://github.com/MikeLockz/rimble-toast-demo
 ```
 
 Change directories
@@ -69,7 +69,6 @@ This is meant to enhance the existing web3 states and show relevant transaction 
 
 - Start
 - Pending
-- First confirmation
 - Success
 - Failure
 
