@@ -33,10 +33,7 @@ class RimbleTransaction extends React.Component {
       console.log(
         "Non-Ethereum browser detected. You should consider trying MetaMask!"
       );
-      window.toastProvider.addMessage("Something?", {
-        message: "No wallet available. Unable to continue.",
-        variant: "failure"
-      });
+
       web3 = false;
     }
 
@@ -51,8 +48,7 @@ class RimbleTransaction extends React.Component {
       this.setState({ contract });
     } catch (error) {
       console.log("Could not create contract.");
-      window.toastProvider.addMessage("Something?", {
-        message: "Contract creation failed.",
+      window.toastProvider.addMessage("Contract creation failed.", {
         variant: "failure"
       });
     }
@@ -62,7 +58,6 @@ class RimbleTransaction extends React.Component {
     try {
       // Request account access if needed
       await window.ethereum.enable().then(wallets => {
-        // TODO: should you always grab first address? What use cases would not be first address?
         const account = wallets[0];
         this.setState({ account });
         console.log("wallet address:", this.state.account);
@@ -70,15 +65,16 @@ class RimbleTransaction extends React.Component {
     } catch (error) {
       // User denied account access...
       console.log("error:", error);
-      window.toastProvider.addMessage("Something?", {
-        message: "User needs to CONNECT wallet",
+      window.toastProvider.addMessage("User needs to CONNECT wallet", {
         variant: "failure"
       });
     }
   };
 
   contractMethodSendWrapper = contractMethod => {
+    // Create new tx and add to collection
     let transaction = this.createTransaction();
+    this.addTransaction(transaction);
 
     // Show toast for starting transaction
     console.log("Starting Transaction");
@@ -91,55 +87,65 @@ class RimbleTransaction extends React.Component {
         .send({ from: account })
         .on("transactionHash", hash => {
           // Submitted to block and received transaction hash
-          console.log("Transaction hash generated.");
+          console.log("Transaction hash generated: ", hash);
+          console.log("transactions", transaction);
 
           // Set properties on the current transaction
-          transaction.hash = hash;
+          transaction.transactionHash = hash;
           transaction.status = "pending";
-
-          // Add transaction to the collection
-          this.addTransaction(hash, transaction);
+          this.updateTransaction(transaction);
 
           // Show user current status
           this.showTransactionToast(transaction);
         })
         .on("confirmation", (confirmationNumber, receipt) => {
-          // Confirmed with receipt
-          console.log("confirmation receipt: ", receipt);
+          // Update
+          transaction.confirmationCount += 1;
 
-          // Set properties on the current transaction
-          transaction.confirmations = confirmationNumber;
-
-          // Must receive this many confirmations before showing confirmation toast
+          // How many confirmations should be received before informing the user
           const confidenceThreshold = 3;
 
-          // Somehow determine if this is an already confirmed tx? 10?
-          if (confirmationNumber < confidenceThreshold) {
+          if (transaction.confirmationCount === 1) {
+            // Initial confirmation receipt
+            console.log("Transaction confirmed.");
+            transaction.status = "confirmed";
+
+            this.showTransactionToast(transaction);
+          } else if (transaction.confirmationCount < confidenceThreshold) {
             console.log(
               "Confirmation " +
-                confirmationNumber +
+                transaction.confirmationCount +
                 ". Threshold for confidence not met."
             );
-          } else if (confirmationNumber === confidenceThreshold) {
-            console.log("Transaction confirmed.");
-            this.determineTransactionStatus(receipt, transaction);
-          } else if (confirmationNumber > confidenceThreshold) {
+            // return;
+          } else if (transaction.confirmationCount === confidenceThreshold) {
+            console.log("Confidence threshold met.");
+            // check the status from result since we are confident in the result
+            if (receipt.status) {
+              console.log("Transaction completed successfully!");
+              transaction.status = "success";
+            } else if (!receipt.status) {
+              console.log("Transaction reverted due to error.");
+              transaction.status = "error";
+            }
+
+            this.showTransactionToast(transaction);
+            // return;
+          } else if (transaction.confirmationCount > confidenceThreshold) {
             console.log(
               "Confirmation " +
-                confirmationNumber +
+                transaction.confirmationCount +
                 ". Confidence threshold already met."
             );
           }
 
           // Update transaction with receipt details
-          //transaction = { ...transaction, ...receipt };
-          this.updateTransaction(transaction.hash, transaction);
-          this.showTransactionToast(transaction);
+          this.updateTransaction(transaction);
+          // this.showTransactionToast(transaction);
         })
         .on("receipt", receipt => {
           // Received receipt
           console.log("receipt: ", receipt);
-          // TODO: What properties of a receipt should be checked and show a toast?
         })
         .on("error", error => {
           // Errored out
@@ -159,22 +165,25 @@ class RimbleTransaction extends React.Component {
     let transaction = {};
     transaction.created = Date.now();
     transaction.status = "started";
+    transaction.confirmationCount = 0;
 
     return transaction;
   };
 
-  addTransaction = (hash, transaction) => {
-    const transactions = { ...this.props.transactions };
-
-    transactions[hash] = transaction;
-    this.setState({ transaction });
+  addTransaction = transaction => {
+    console.log("adding new transaction:", this.state.transactions);
+    const transactions = { ...this.state.transactions };
+    transactions[`tx${transaction.created}`] = transaction;
+    this.setState({ transactions });
   };
 
   // Add/update transaction in state
-  updateTransaction = (hash, updatedTransaction) => {
-    const transactions = { ...this.props.transactions };
-
-    transactions[hash] = updatedTransaction;
+  updateTransaction = updatedTransaction => {
+    console.log("updating transactions: ", this.state.transactions);
+    const transactions = { ...this.state.transactions };
+    console.log("Updating transaction: ", updatedTransaction);
+    debugger;
+    transactions[`tx${updatedTransaction.created}`] = updatedTransaction;
     this.setState({ transactions });
   };
 
@@ -205,7 +214,7 @@ class RimbleTransaction extends React.Component {
     let toastMeta = this.getTransactionToastMeta(transaction);
 
     // Show toast
-    window.toastProvider.addMessage("...", toastMeta);
+    window.toastProvider.addMessage(".", toastMeta);
   };
 
   getTransactionToastMeta = transaction => {
@@ -213,11 +222,11 @@ class RimbleTransaction extends React.Component {
     let status = transaction.status;
     let transactionHash = transaction.transactionHash;
 
-    // TODO: Move this into external file and import
     switch (status) {
       case "started":
         transactionToastMeta = {
-          message: "Started a new transaction",
+          message: "Change submitted",
+          secondaryMessage: "Confirm in MetaMask",
           actionHref: "",
           actionText: "",
           variant: "default",
@@ -226,7 +235,8 @@ class RimbleTransaction extends React.Component {
         break;
       case "pending":
         transactionToastMeta = {
-          message: "Transaction is pending",
+          message: "Processing change...",
+          secondaryMessage: "This may take a few minutes",
           actionHref: "",
           actionText: "",
           variant: "processing"
@@ -234,23 +244,24 @@ class RimbleTransaction extends React.Component {
         break;
       case "confirmed":
         transactionToastMeta = {
-          message: "Transaction is confirmed",
+          message: "First block confirmed",
+          secondaryMessage: "Your change is in progress",
           actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
-          actionText: "View on Etherscan",
-          variant: "success"
+          actionText: "Check progress",
+          variant: "processing"
         };
         break;
       case "success":
         transactionToastMeta = {
-          message: "Transaction completed successfully",
-          actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
-          actionText: "View on Etherscan",
+          message: "Smart contract value changed",
           variant: "success"
         };
         break;
       case "error":
         transactionToastMeta = {
-          message: "Error",
+          message: "Value change failed",
+          secondarymessage:
+            "Make sure you have enough Ether (ETH) and try again",
           actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
           actionText: "View on Etherscan",
           variant: "failure"
@@ -266,7 +277,10 @@ class RimbleTransaction extends React.Component {
     contract: {},
     account: null,
     web3: null,
-    transactions: {},
+    transactions: {
+      tx1: { transactionHash: 1, status: "pending" },
+      tx2: { transactionHash: 2, status: "complete" }
+    },
     initWeb3: this.initWeb3,
     initContract: this.initContract,
     initAccount: this.initAccount,
