@@ -142,14 +142,14 @@ class SmartContractControls extends React.Component {
           borderBottom={1}
           borderColor={"#E8E8E8"}
           justifyContent="space-between"
-          alignItems="center"
+          alignItems="end"
         >
           <Text mb={2} fontSize={3}>
             Smart contract value
           </Text>
 
           <OutlineButton
-            size={"medium"}
+            size={"small"}
             onClick={this.resetCounter}
             disabled={!this.props.account}
           >

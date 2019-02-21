@@ -73,12 +73,14 @@ class RimbleTransaction extends React.Component {
 
   contractMethodSendWrapper = contractMethod => {
     // Create new tx and add to collection
+    // Maybe this needs to get moved out of the wrapper?
     let transaction = this.createTransaction();
     this.addTransaction(transaction);
 
     // Show toast for starting transaction
     console.log("Starting Transaction");
-    this.showTransactionToast(transaction);
+    transaction.status = "started";
+    this.updateTransaction(transaction);
 
     const { contract, account } = this.state;
 
@@ -94,12 +96,9 @@ class RimbleTransaction extends React.Component {
           transaction.transactionHash = hash;
           transaction.status = "pending";
           this.updateTransaction(transaction);
-
-          // Show user current status
-          this.showTransactionToast(transaction);
         })
         .on("confirmation", (confirmationNumber, receipt) => {
-          // Update
+          // Update confirmation count on each subsequent confirmation that's received
           transaction.confirmationCount += 1;
 
           // How many confirmations should be received before informing the user
@@ -109,15 +108,12 @@ class RimbleTransaction extends React.Component {
             // Initial confirmation receipt
             console.log("Transaction confirmed.");
             transaction.status = "confirmed";
-
-            this.showTransactionToast(transaction);
           } else if (transaction.confirmationCount < confidenceThreshold) {
             console.log(
               "Confirmation " +
                 transaction.confirmationCount +
                 ". Threshold for confidence not met."
             );
-            // return;
           } else if (transaction.confirmationCount === confidenceThreshold) {
             console.log("Confidence threshold met.");
             // check the status from result since we are confident in the result
@@ -128,9 +124,6 @@ class RimbleTransaction extends React.Component {
               console.log("Transaction reverted due to error.");
               transaction.status = "error";
             }
-
-            this.showTransactionToast(transaction);
-            // return;
           } else if (transaction.confirmationCount > confidenceThreshold) {
             console.log(
               "Confirmation " +
@@ -167,7 +160,7 @@ class RimbleTransaction extends React.Component {
     let transaction = {};
     transaction.created = Date.now();
     transaction.lastUpdated = Date.now();
-    transaction.status = "started";
+    transaction.status = "initialized";
     transaction.confirmationCount = 0;
 
     return transaction;
@@ -262,8 +255,8 @@ class RimbleTransaction extends React.Component {
           message: "Value change failed",
           secondarymessage:
             "Make sure you have enough Ether (ETH) and try again",
-          actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
-          actionText: "View on Etherscan",
+          actionHref: "",
+          actionText: "",
           variant: "failure"
         };
         break;
