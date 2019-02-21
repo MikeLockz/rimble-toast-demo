@@ -80,6 +80,7 @@ class RimbleTransaction extends React.Component {
     // Show toast for starting transaction
     console.log("Starting Transaction");
     transaction.status = "started";
+    console.log("methodSendWrapper", transaction);
     this.updateTransaction(transaction);
 
     const { contract, account } = this.state;
@@ -178,6 +179,7 @@ class RimbleTransaction extends React.Component {
     updatedTransaction.lastUpdated = Date.now();
     transactions[`tx${updatedTransaction.created}`] = updatedTransaction;
     this.setState({ transactions });
+    console.log("Updated transaction: ", updatedTransaction);
   };
 
   // Pass transactions to context

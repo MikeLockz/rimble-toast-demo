@@ -15,6 +15,8 @@ class TransactionToastUtil extends React.Component {
       Object.keys(prevProps.transactions).length > 0
     ) {
       // Get the updated transaction object
+      // TODO: this assumes that there was a previous object to compare - which isn't true for STARTED
+
       updatedTransaction = Object.keys(this.props.transactions).map(key => {
         return prevProps.transactions[key] &&
           prevProps.transactions[key].status ===
@@ -25,13 +27,23 @@ class TransactionToastUtil extends React.Component {
       transaction = updatedTransaction[0];
     }
 
+    // If no matching tx in prevProps (new), then use tx from this.props
+    if (!!transaction) {
+      const transactionKey = Object.keys(this.props.transactions).filter(
+        key => {
+          return !Object.keys(prevProps.transactions).includes(key);
+        }
+      );
+      transaction = this.props.transactions[transactionKey];
+    }
+
+    console.log("transaction: ", transaction);
+
     // Process different transaction status'
-    if (updatedTransaction.length > 0) {
+    if (!!transaction) {
       console.log("Checking process status", transaction.status);
       switch (transaction.status) {
         case "started":
-          // Why does this never fire?
-          console.log("Inside and started.");
           this.showTransactionToast(transaction);
           break;
         case "pending":
@@ -41,7 +53,7 @@ class TransactionToastUtil extends React.Component {
           // this.showTransactionToast(transaction);
           break;
         case "success":
-          // TODO: How to honor the count to verify here?
+          // TODO: How to honor the count to verify here? Pass in as prop? Read from context?
           if (transaction.confirmationCount === 3)
             this.showTransactionToast(transaction);
           break;
