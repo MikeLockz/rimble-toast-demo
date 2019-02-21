@@ -16,8 +16,9 @@ class TransactionToastUtil extends React.Component {
     ) {
       // Get the updated transaction object
       updatedTransaction = Object.keys(this.props.transactions).map(key => {
-        return prevProps.transactions[key].status ===
-          this.props.transactions[key].status
+        return prevProps.transactions[key] &&
+          prevProps.transactions[key].status ===
+            this.props.transactions[key].status
           ? this.props.transactions[key]
           : null;
       });
@@ -40,7 +41,7 @@ class TransactionToastUtil extends React.Component {
           // this.showTransactionToast(transaction);
           break;
         case "success":
-          // How to honor the count to verify here?
+          // TODO: How to honor the count to verify here?
           if (transaction.confirmationCount === 3)
             this.showTransactionToast(transaction);
           break;

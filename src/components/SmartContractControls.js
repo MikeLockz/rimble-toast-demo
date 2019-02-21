@@ -92,8 +92,11 @@ class SmartContractControls extends React.Component {
     ) {
       // Get the updated transaction object
       updatedTransaction = Object.keys(this.props.transactions).map(key => {
-        return prevProps.transactions[key].status ===
-          this.props.transactions[key].status
+        // TODO: This is failing when creating a second transaction, can't read property status of null
+
+        return prevProps.transactions[key] &&
+          prevProps.transactions[key].status ===
+            this.props.transactions[key].status
           ? this.props.transactions[key]
           : null;
       });
