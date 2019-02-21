@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Heading } from "rimble-ui";
+import { Card, Heading, Box, Flex, Text } from "rimble-ui";
 
 class TransactionsCard extends React.Component {
   render() {
@@ -8,9 +8,23 @@ class TransactionsCard extends React.Component {
         <Heading.h2 fontSize={3} textAlign={"center"} px={4} mb={5}>
           Transactions
         </Heading.h2>
-        <ul>
-          {!this.props.transactions ? (
-            <li>No recent transactions</li>
+        <Box>
+          {Object.keys(this.props.transactions).length > 0 ? (
+            <Flex>
+              <Text width={"33%"} textAlign={"center"} fontWeight="bold">
+                txHash
+              </Text>
+              <Text width={"33%"} textAlign={"center"} fontWeight="bold">
+                Status
+              </Text>
+              <Text width={"33%"} textAlign={"center"} fontWeight="bold">
+                Confirmations
+              </Text>
+            </Flex>
+          ) : null}
+
+          {Object.keys(this.props.transactions).length < 1 ? (
+            <Text textAlign={"center"}>No recent transactions</Text>
           ) : (
             Object.keys(this.props.transactions).map((keyName, keyIndex) => {
               let txHash = "";
@@ -18,21 +32,27 @@ class TransactionsCard extends React.Component {
                 txHash = this.props.transactions[
                   keyName
                 ].transactionHash.toString();
-                const txStart = txHash.substr(0, 5);
+                const txStart = txHash.substr(0, 7);
                 const txEnd = txHash.substr(txHash.length - 4);
                 txHash = txStart + "..." + txEnd;
               }
 
               return (
-                <li key={keyIndex}>
-                  Hash: {txHash} | Status:{" "}
-                  {this.props.transactions[keyName].status} | Confirmation
-                  Count: {this.props.transactions[keyName].confirmationCount}
-                </li>
+                <Flex>
+                  <Text width={"33%"} textAlign={"center"}>
+                    {txHash}
+                  </Text>
+                  <Text width={"33%"} textAlign={"center"}>
+                    {this.props.transactions[keyName].status}
+                  </Text>
+                  <Text width={"33%"} textAlign={"center"}>
+                    {this.props.transactions[keyName].confirmationCount}
+                  </Text>
+                </Flex>
               );
             })
           )}
-        </ul>
+        </Box>
       </Card>
     );
   }
