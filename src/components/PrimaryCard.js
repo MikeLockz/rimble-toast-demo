@@ -4,6 +4,7 @@ import RimbleWeb3 from "./RimbleWeb3";
 import ConnectButton from "./ConnectButton";
 import SmartContractControls from "./SmartContractControls";
 import TransactionsCard from "./TransactionsCard";
+import RimbleTransactionToast from "./RimbleTransactionToast";
 
 class PrimaryCard extends React.Component {
   render() {
@@ -33,6 +34,7 @@ class PrimaryCard extends React.Component {
             </Card>
 
             <TransactionsCard transactions={transactions} />
+            <RimbleTransactionToast transactions={transactions} />
           </div>
         )}
       </RimbleWeb3.Consumer>

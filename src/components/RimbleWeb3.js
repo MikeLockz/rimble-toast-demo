@@ -151,11 +151,13 @@ class RimbleTransaction extends React.Component {
           // Errored out
           console.log(error);
           transaction.status = "error";
+          this.updateTransaction(transaction);
           this.showTransactionToast(transaction);
         });
     } catch (error) {
       console.log("Error calling method on smart contract.");
       transaction.status = "error";
+      this.updateTransaction(transaction);
       this.showTransactionToast(transaction);
     }
   };
@@ -164,6 +166,7 @@ class RimbleTransaction extends React.Component {
   createTransaction = () => {
     let transaction = {};
     transaction.created = Date.now();
+    transaction.lastUpdated = Date.now();
     transaction.status = "started";
     transaction.confirmationCount = 0;
 
@@ -171,7 +174,6 @@ class RimbleTransaction extends React.Component {
   };
 
   addTransaction = transaction => {
-    console.log("adding new transaction:", this.state.transactions);
     const transactions = { ...this.state.transactions };
     transactions[`tx${transaction.created}`] = transaction;
     this.setState({ transactions });
@@ -179,10 +181,8 @@ class RimbleTransaction extends React.Component {
 
   // Add/update transaction in state
   updateTransaction = updatedTransaction => {
-    console.log("updating transactions: ", this.state.transactions);
     const transactions = { ...this.state.transactions };
-    console.log("Updating transaction: ", updatedTransaction);
-    debugger;
+    updatedTransaction.lastUpdated = Date.now();
     transactions[`tx${updatedTransaction.created}`] = updatedTransaction;
     this.setState({ transactions });
   };
@@ -277,10 +277,7 @@ class RimbleTransaction extends React.Component {
     contract: {},
     account: null,
     web3: null,
-    transactions: {
-      tx1: { transactionHash: 1, status: "pending" },
-      tx2: { transactionHash: 2, status: "complete" }
-    },
+    transactions: {},
     initWeb3: this.initWeb3,
     initContract: this.initContract,
     initAccount: this.initAccount,

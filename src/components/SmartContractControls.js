@@ -80,6 +80,35 @@ class SmartContractControls extends React.Component {
     }
   };
 
+  // Check for updates to the transactions collection
+  processTransactionUpdates = prevProps => {
+    let updatedTransaction = {};
+
+    // Only run this if there's something different
+    if (
+      prevProps &&
+      prevProps.transactions !== this.props.transactions &&
+      Object.keys(prevProps.transactions).length > 0
+    ) {
+      // Get the updated transaction object
+      updatedTransaction = Object.keys(this.props.transactions).map(key => {
+        return prevProps.transactions[key].status ===
+          this.props.transactions[key].status
+          ? this.props.transactions[key]
+          : null;
+      });
+    }
+
+    // Process different transaction status'
+    if (
+      updatedTransaction.length > 0 &&
+      updatedTransaction[0].status === "success"
+    ) {
+      console.log("Getting updated number.");
+      this.getNumber();
+    }
+  };
+
   resetCounter = () => {
     this.props.contractMethodSendWrapper("reset");
   };
@@ -98,6 +127,10 @@ class SmartContractControls extends React.Component {
       // Can finally interact with contract
       this.getNumber();
     });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    this.processTransactionUpdates(prevProps);
   }
 
   render() {
