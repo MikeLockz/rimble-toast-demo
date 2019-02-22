@@ -133,8 +133,9 @@ class RimbleTransaction extends React.Component {
           this.updateTransaction(transaction);
           // TODO: should this be a custom error? What is the error here?
           // TODO: determine how to handle error messages globally
+          // This display for both a user rejection and a contract failure. Is there a way to differentiate?
           window.toastProvider.addMessage("Value change failed", {
-            secondaryMessage: "Transaction rejected by MetaMask",
+            secondaryMessage: "Could not change value.",
             actionHref: "",
             actionText: "",
             variant: "failure"
