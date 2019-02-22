@@ -77,8 +77,12 @@ class RimbleTransaction extends React.Component {
     let transaction = this.createTransaction();
     this.addTransaction(transaction);
 
-    // Show toast for starting transaction
+    // Add meta data to transaction
+    transaction.method = contractMethod;
+    transaction.type = "contract";
     transaction.status = "started";
+
+    // Show toast for starting transaction
     this.updateTransaction(transaction);
 
     const { contract, account } = this.state;
@@ -133,7 +137,6 @@ class RimbleTransaction extends React.Component {
           this.updateTransaction(transaction);
           // TODO: should this be a custom error? What is the error here?
           // TODO: determine how to handle error messages globally
-          // This display for both a user rejection and a contract failure. Is there a way to differentiate?
           window.toastProvider.addMessage("Value change failed", {
             secondaryMessage: "Could not change value.",
             actionHref: "",
