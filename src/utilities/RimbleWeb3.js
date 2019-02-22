@@ -78,9 +78,7 @@ class RimbleTransaction extends React.Component {
     this.addTransaction(transaction);
 
     // Show toast for starting transaction
-    console.log("Starting Transaction");
     transaction.status = "started";
-    console.log("methodSendWrapper", transaction);
     this.updateTransaction(transaction);
 
     const { contract, account } = this.state;
@@ -90,12 +88,10 @@ class RimbleTransaction extends React.Component {
         .send({ from: account })
         .on("transactionHash", hash => {
           // Submitted to block and received transaction hash
-          console.log("Transaction hash generated: ", hash);
-          console.log("transactions", transaction);
-
           // Set properties on the current transaction
           transaction.transactionHash = hash;
           transaction.status = "pending";
+          transaction.recentEvent = "transactionHash";
           this.updateTransaction(transaction);
         })
         .on("confirmation", (confirmationNumber, receipt) => {
@@ -107,52 +103,54 @@ class RimbleTransaction extends React.Component {
 
           if (transaction.confirmationCount === 1) {
             // Initial confirmation receipt
-            console.log("Transaction confirmed.");
             transaction.status = "confirmed";
           } else if (transaction.confirmationCount < confidenceThreshold) {
-            console.log(
-              "Confirmation " +
-                transaction.confirmationCount +
-                ". Threshold for confidence not met."
-            );
+            // Not enough confirmations to match threshold
           } else if (transaction.confirmationCount === confidenceThreshold) {
-            console.log("Confidence threshold met.");
-            // check the status from result since we are confident in the result
+            // Confirmations match threshold
+            // Check the status from result since we are confident in the result
             if (receipt.status) {
-              console.log("Transaction completed successfully!");
               transaction.status = "success";
             } else if (!receipt.status) {
-              console.log("Transaction reverted due to error.");
               transaction.status = "error";
             }
           } else if (transaction.confirmationCount > confidenceThreshold) {
-            console.log(
-              "Confirmation " +
-                transaction.confirmationCount +
-                ". Confidence threshold already met."
-            );
+            // Confidence threshold met
           }
-
           // Update transaction with receipt details
+          transaction.recentEvent = "confirmation";
           this.updateTransaction(transaction);
-          // this.showTransactionToast(transaction);
         })
         .on("receipt", receipt => {
-          // Received receipt
-          console.log("receipt: ", receipt);
+          // Received receipt, met total number of confirmations
+          transaction.recentEvent = "receipt";
+          this.updateTransaction(transaction);
         })
         .on("error", error => {
           // Errored out
-          console.log(error);
           transaction.status = "error";
+          transaction.recentEvent = "error";
           this.updateTransaction(transaction);
-          this.showTransactionToast(transaction);
+          // TODO: should this be a custom error? What is the error here?
+          // TODO: determine how to handle error messages globally
+          window.toastProvider.addMessage("Value change failed", {
+            secondaryMessage: "Transaction rejected by MetaMask",
+            actionHref: "",
+            actionText: "",
+            variant: "failure"
+          });
         });
     } catch (error) {
-      console.log("Error calling method on smart contract.");
       transaction.status = "error";
       this.updateTransaction(transaction);
-      this.showTransactionToast(transaction);
+      // TODO: should this be a custom error? What is the error here?
+      // TODO: determine how to handle error messages globally
+      window.toastProvider.addMessage("Value change failed", {
+        secondaryMessage: "Could not change value on smart contract",
+        actionHref: "",
+        actionText: "",
+        variant: "failure"
+      });
     }
   };
 
@@ -179,93 +177,6 @@ class RimbleTransaction extends React.Component {
     updatedTransaction.lastUpdated = Date.now();
     transactions[`tx${updatedTransaction.created}`] = updatedTransaction;
     this.setState({ transactions });
-    console.log("Updated transaction: ", updatedTransaction);
-  };
-
-  // Pass transactions to context
-
-  // On all tranasction status changes, run tx through decorator
-
-  // Check the status from receipt of transaction
-  determineTransactionStatus = (receipt, transaction) => {
-    if (receipt.status === true) {
-      console.log("Transaction completed successfully!");
-      transaction.status = "success";
-    } else if (receipt.status === false) {
-      console.log("Transaction reverted due to error.");
-      transaction.status = "error";
-    }
-
-    this.showTransactionToast(transaction);
-  };
-
-  showTransactionToast = incomingTransaction => {
-    let transaction = {};
-    // Add extra info to transaction
-    transaction.lastUpdated = Date.now();
-    transaction = { ...transaction, ...incomingTransaction };
-
-    // Get text info for toast
-    let toastMeta = this.getTransactionToastMeta(transaction);
-
-    // Show toast
-    window.toastProvider.addMessage(".", toastMeta);
-  };
-
-  getTransactionToastMeta = transaction => {
-    let transactionToastMeta = {};
-    let status = transaction.status;
-    let transactionHash = transaction.transactionHash;
-
-    switch (status) {
-      case "started":
-        transactionToastMeta = {
-          message: "Change submitted",
-          secondaryMessage: "Confirm in MetaMask",
-          actionHref: "",
-          actionText: "",
-          variant: "default",
-          icon: "InfoOutline"
-        };
-        break;
-      case "pending":
-        transactionToastMeta = {
-          message: "Processing change...",
-          secondaryMessage: "This may take a few minutes",
-          actionHref: "",
-          actionText: "",
-          variant: "processing"
-        };
-        break;
-      case "confirmed":
-        transactionToastMeta = {
-          message: "First block confirmed",
-          secondaryMessage: "Your change is in progress",
-          actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
-          actionText: "Check progress",
-          variant: "processing"
-        };
-        break;
-      case "success":
-        transactionToastMeta = {
-          message: "Smart contract value changed",
-          variant: "success"
-        };
-        break;
-      case "error":
-        transactionToastMeta = {
-          message: "Value change failed",
-          secondarymessage:
-            "Make sure you have enough Ether (ETH) and try again",
-          actionHref: "",
-          actionText: "",
-          variant: "failure"
-        };
-        break;
-      default:
-        break;
-    }
-    return transactionToastMeta;
   };
 
   state = {

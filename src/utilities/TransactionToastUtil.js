@@ -28,7 +28,7 @@ class TransactionToastUtil extends React.Component {
     }
 
     // If no matching tx in prevProps (new), then use tx from this.props
-    if (!!transaction) {
+    if (Object.keys(transaction).length === 0) {
       const transactionKey = Object.keys(this.props.transactions).filter(
         key => {
           return !Object.keys(prevProps.transactions).includes(key);
@@ -37,11 +37,11 @@ class TransactionToastUtil extends React.Component {
       transaction = this.props.transactions[transactionKey];
     }
 
-    console.log("transaction: ", transaction);
-
     // Process different transaction status'
-    if (!!transaction) {
-      console.log("Checking process status", transaction.status);
+    if (
+      typeof transaction !== "undefined" &&
+      Object.keys(transaction).length !== 0
+    ) {
       switch (transaction.status) {
         case "started":
           this.showTransactionToast(transaction);
@@ -114,7 +114,7 @@ class TransactionToastUtil extends React.Component {
       case "error":
         transactionToastMeta = {
           message: "Value change failed",
-          secondarymessage:
+          secondaryMessage:
             "Make sure you have enough Ether (ETH) and try again",
           actionHref: "",
           actionText: "",

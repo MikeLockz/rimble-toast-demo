@@ -105,7 +105,8 @@ class SmartContractControls extends React.Component {
     // Process different transaction status'
     if (
       updatedTransaction.length > 0 &&
-      updatedTransaction[0].status === "success"
+      updatedTransaction[0].status === "success" &&
+      updatedTransaction[0].confirmationNumber === 3
     ) {
       console.log("Getting updated number.");
       this.getNumber();
