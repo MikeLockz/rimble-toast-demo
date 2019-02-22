@@ -82,6 +82,8 @@ class SmartContractControls extends React.Component {
 
   // Check for updates to the transactions collection
   processTransactionUpdates = prevProps => {
+    // TODO: How to make this whole thing reusable by other components?
+
     let updatedTransaction = {};
 
     // Only run this if there's something different
@@ -106,7 +108,7 @@ class SmartContractControls extends React.Component {
     if (
       updatedTransaction.length > 0 &&
       updatedTransaction[0].status === "success" &&
-      updatedTransaction[0].confirmationNumber === 3
+      updatedTransaction[0].confirmationCount === 3
     ) {
       console.log("Getting updated number.");
       this.getNumber();
