@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/rimble-toast-demo/precache-manifest.8894886317fcab204735bab77c8648a3.js"
+  "/rimble-app-demo/precache-manifest.a1fe2ec1bdc2365e5e3f9a98558ae19b.js"
 );
 
 workbox.clientsClaim();
@@ -28,7 +28,7 @@ self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
-workbox.routing.registerNavigationRoute("/rimble-toast-demo/index.html", {
+workbox.routing.registerNavigationRoute("/rimble-app-demo/index.html", {
   
   blacklist: [/^\/_/,/\/[^\/]+\.[^\/]+$/],
 });

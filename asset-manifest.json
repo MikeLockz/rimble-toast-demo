@@ -1,11 +1,11 @@
 {
-  "main.js": "/rimble-toast-demo/static/js/main.a5b584db.chunk.js",
-  "main.js.map": "/rimble-toast-demo/static/js/main.a5b584db.chunk.js.map",
-  "static/js/1.907e4590.chunk.js": "/rimble-toast-demo/static/js/1.907e4590.chunk.js",
-  "static/js/1.907e4590.chunk.js.map": "/rimble-toast-demo/static/js/1.907e4590.chunk.js.map",
-  "runtime~main.js": "/rimble-toast-demo/static/js/runtime~main.a51067e3.js",
-  "runtime~main.js.map": "/rimble-toast-demo/static/js/runtime~main.a51067e3.js.map",
-  "index.html": "/rimble-toast-demo/index.html",
-  "precache-manifest.8894886317fcab204735bab77c8648a3.js": "/rimble-toast-demo/precache-manifest.8894886317fcab204735bab77c8648a3.js",
-  "service-worker.js": "/rimble-toast-demo/service-worker.js"
+  "main.js": "/rimble-app-demo/static/js/main.b03781aa.chunk.js",
+  "main.js.map": "/rimble-app-demo/static/js/main.b03781aa.chunk.js.map",
+  "static/js/1.1ac2afcd.chunk.js": "/rimble-app-demo/static/js/1.1ac2afcd.chunk.js",
+  "static/js/1.1ac2afcd.chunk.js.map": "/rimble-app-demo/static/js/1.1ac2afcd.chunk.js.map",
+  "runtime~main.js": "/rimble-app-demo/static/js/runtime~main.040bab33.js",
+  "runtime~main.js.map": "/rimble-app-demo/static/js/runtime~main.040bab33.js.map",
+  "index.html": "/rimble-app-demo/index.html",
+  "precache-manifest.a1fe2ec1bdc2365e5e3f9a98558ae19b.js": "/rimble-app-demo/precache-manifest.a1fe2ec1bdc2365e5e3f9a98558ae19b.js",
+  "service-worker.js": "/rimble-app-demo/service-worker.js"
 }
