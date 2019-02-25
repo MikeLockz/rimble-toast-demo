@@ -34,6 +34,8 @@ class TransactionToastUtil extends React.Component {
           prevCollection[key].lastUpdated !== currentCollection[key].lastUpdated
         ) {
           return currentCollection[key];
+        } else {
+          return null;
         }
       })
       .filter(object => typeof object !== "undefined");
@@ -94,56 +96,6 @@ class TransactionToastUtil extends React.Component {
   getTransactionToastMeta = transaction => {
     let transactionToastMeta = {};
     let status = transaction.status;
-    let transactionHash = transaction.transactionHash;
-
-    // switch (status) {
-    //   case "started":
-    //     transactionToastMeta = {
-    //       message: "Change submitted",
-    //       secondaryMessage: "Confirm in MetaMask",
-    //       actionHref: "",
-    //       actionText: "",
-    //       variant: "default",
-    //       icon: "InfoOutline"
-    //     };
-    //     break;
-    //   case "pending":
-    //     transactionToastMeta = {
-    //       message: "Processing change...",
-    //       secondaryMessage: "This may take a few minutes",
-    //       actionHref: "",
-    //       actionText: "",
-    //       variant: "processing"
-    //     };
-    //     break;
-    //   case "confirmed":
-    //     transactionToastMeta = {
-    //       message: "First block confirmed",
-    //       secondaryMessage: "Your change is in progress",
-    //       actionHref: "https://rinkeby.etherscan.io/tx/" + transactionHash,
-    //       actionText: "Check progress",
-    //       variant: "processing"
-    //     };
-    //     break;
-    //   case "success":
-    //     transactionToastMeta = {
-    //       message: "Smart contract value changed",
-    //       variant: "success"
-    //     };
-    //     break;
-    //   case "error":
-    //     transactionToastMeta = {
-    //       message: "Value change failed",
-    //       secondaryMessage:
-    //         "Make sure you have enough Ether (ETH) and try again",
-    //       actionHref: "",
-    //       actionText: "",
-    //       variant: "failure"
-    //     };
-    //     break;
-    //   default:
-    //     break;
-    // }
 
     switch (status) {
       case "started":
