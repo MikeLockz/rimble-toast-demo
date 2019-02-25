@@ -1,5 +1,6 @@
 import React from "react";
 import { Flex, Box, Text, Button, OutlineButton } from "rimble-ui";
+import TransactionToastUtil from "../utilities/TransactionToastUtil";
 
 // Address of the deployed smart contract (from etherscan)
 const contractAddress = "0x0f69f0ac4b92bf0d101b5747eed3fa6b653a36f8";
