@@ -38,7 +38,7 @@ class TransactionToastUtil extends React.Component {
           return null;
         }
       })
-      .filter(object => typeof object !== "undefined");
+      .filter(object => object !== null);
     return updatedTransaction[0];
   };
 

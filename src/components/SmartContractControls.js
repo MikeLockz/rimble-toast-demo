@@ -57,7 +57,8 @@ const contractAbi = [
 
 class SmartContractControls extends React.Component {
   state = {
-    value: 0
+    value: 0,
+    needsUpdate: false
   };
 
   // gets the number stored in smart contract storage
@@ -69,7 +70,7 @@ class SmartContractControls extends React.Component {
         .call()
         .then(value => {
           value = Number(value.toString());
-          this.setState({ value });
+          this.setState({ value, needsUpdate: false });
         })
         .catch(error => {
           console.log(error);
@@ -84,7 +85,7 @@ class SmartContractControls extends React.Component {
   processTransactionUpdates = prevProps => {
     Object.keys(this.props.transactions).map(key => {
       let tx = this.props.transactions[key];
-      if (tx.status === "success" && tx.confirmationCount === 4) {
+      if (tx.status === "success" && this.state.needsUpdate) {
         console.log("Getting updated number.");
         this.getNumber();
         return false;
@@ -100,10 +101,16 @@ class SmartContractControls extends React.Component {
 
   incrementCounter = () => {
     this.props.contractMethodSendWrapper("incrementCounter");
+    this.setState({
+      needsUpdate: true
+    });
   };
 
   decrementCounter = () => {
     this.props.contractMethodSendWrapper("decrementCounter");
+    this.setState({
+      needsUpdate: true
+    });
   };
 
   componentDidMount() {
