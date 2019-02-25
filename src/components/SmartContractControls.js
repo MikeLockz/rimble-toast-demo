@@ -83,33 +83,13 @@ class SmartContractControls extends React.Component {
 
   // Check for updates to the transactions collection
   processTransactionUpdates = prevProps => {
-    // // TODO: How to make this whole thing reusable by other components?
-    // let updatedTransaction = {};
-    // // Only run this if there's something different
-    // if (
-    //   prevProps &&
-    //   prevProps.transactions !== this.props.transactions &&
-    //   Object.keys(prevProps.transactions).length > 0
-    // ) {
-    //   // Get the updated transaction object
-    //   updatedTransaction = Object.keys(this.props.transactions).map(key => {
-    //     // TODO: This is failing when creating a second transaction, can't read property status of null
-    //     return prevProps.transactions[key] &&
-    //       prevProps.transactions[key].status ===
-    //         this.props.transactions[key].status
-    //       ? this.props.transactions[key]
-    //       : null;
-    //   });
-    // }
-    // // Process different transaction status'
-    // if (
-    //   updatedTransaction.length > 0 &&
-    //   updatedTransaction[0].status === "success" &&
-    //   updatedTransaction[0].confirmationCount === 3
-    // ) {
-    //   console.log("Getting updated number.");
-    //   this.getNumber();
-    // }
+    Object.keys(this.props.transactions).map(key => {
+      let tx = this.props.transactions[key];
+      if (tx.status === "success" && tx.confirmationCount === 4) {
+        console.log("Getting updated number.");
+        this.getNumber();
+      }
+    });
   };
 
   resetCounter = () => {
