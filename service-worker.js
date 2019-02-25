@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/rimble-toast-demo/precache-manifest.f5c00908e1645b36c1db1c1b56a18ad0.js"
+  "/rimble-toast-demo/precache-manifest.604e794cf4c706bb7ca1ac07c7a2294d.js"
 );
 
 workbox.clientsClaim();
