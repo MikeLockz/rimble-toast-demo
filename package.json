@@ -3,6 +3,9 @@
   "version": "0.4.0",
   "private": true,
   "dependencies": {
+    "enzyme": "^3.9.0",
+    "enzyme-adapter-react-16": "^1.9.1",
+    "enzyme-to-json": "^3.3.5",
     "gh-pages": "^2.0.1",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
@@ -30,5 +33,10 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "homepage": "https://mikelockz.github.io/rimble-toast-demo/"
+  "homepage": "https://mikelockz.github.io/rimble-toast-demo/",
+  "jest": {
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ]
+  }
 }

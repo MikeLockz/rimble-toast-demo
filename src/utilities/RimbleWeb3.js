@@ -178,8 +178,9 @@ class RimbleTransaction extends React.Component {
   // Add/update transaction in state
   updateTransaction = updatedTransaction => {
     const transactions = { ...this.state.transactions };
-    updatedTransaction.lastUpdated = Date.now();
-    transactions[`tx${updatedTransaction.created}`] = updatedTransaction;
+    const transaction = { ...updatedTransaction };
+    transaction.lastUpdated = Date.now();
+    transactions[`tx${updatedTransaction.created}`] = transaction;
     this.setState({ transactions });
   };
 
