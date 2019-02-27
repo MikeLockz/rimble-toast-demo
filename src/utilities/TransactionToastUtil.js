@@ -42,8 +42,8 @@ class TransactionToastUtil extends React.Component {
     return updatedTransaction[0];
   };
 
-  // Returns an object from a collection based on a given identifier
-  getObjectFromCollection = (identifier, collection) => {
+  // Returns an transaction from a collection based on a given identifier
+  getTransactionFromCollection = (identifier, collection) => {
     const object = collection[`tx${identifier}`];
     return object;
   };
@@ -61,7 +61,10 @@ class TransactionToastUtil extends React.Component {
         prevCollection,
         currentCollection
       );
-      prevTx = this.getObjectFromCollection(currentTx.created, prevCollection);
+      prevTx = this.getTransactionFromCollection(
+        currentTx.created,
+        prevCollection
+      );
 
       if (currentTx.status !== prevTx.status) {
         tx = currentTx;
