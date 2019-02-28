@@ -151,6 +151,18 @@ const changedStatusProps = {
   }
 };
 
+const singleTx = {
+  created: 1551107396364,
+  lastUpdated: 1551107430741,
+  status: "success",
+  confirmationCount: 24,
+  method: "incrementCounter",
+  type: "contract",
+  transactionHash:
+    "0x18c56dc171eb8e6f95d0489c8e18a8fde95ee1b8350a624abaa17d2872894f41",
+  recentEvent: "receipt"
+};
+
 describe("TransactionToastUtil initial tests", () => {
   it("accepts transactions prop", () => {
     const wrapper = shallow(
@@ -177,7 +189,7 @@ describe("TransactionToastUtil initial tests", () => {
 });
 
 describe("TransactionToastUtil unit tests", () => {
-  it("test function collectionHasNewObject", () => {
+  it("tests function collectionHasNewObject", () => {
     const wrapper = shallow(
       <TransactionToastUtil transactions={componentProps} />
     );
@@ -191,7 +203,7 @@ describe("TransactionToastUtil unit tests", () => {
     expect(results).toEqual(true);
   });
 
-  it("test function getNewObjectFromCollection", () => {
+  it("tests function getNewObjectFromCollection", () => {
     const wrapper = shallow(
       <TransactionToastUtil transactions={componentProps} />
     );
@@ -201,7 +213,7 @@ describe("TransactionToastUtil unit tests", () => {
     expect(results.created).toBe(1551107396364);
   });
 
-  it("test function getUpdatedObjectFromCollection", () => {
+  it("tests function getUpdatedObjectFromCollection", () => {
     const wrapper = shallow(
       <TransactionToastUtil transactions={componentProps} />
     );
@@ -214,7 +226,7 @@ describe("TransactionToastUtil unit tests", () => {
     expect(results.created).toBe(1551107627514);
   });
 
-  it("test function getTransactionFromCollection", () => {
+  it("tests function getTransactionFromCollection", () => {
     const wrapper = shallow(
       <TransactionToastUtil transactions={componentProps} />
     );
@@ -227,7 +239,7 @@ describe("TransactionToastUtil unit tests", () => {
     expect(results.created).toBe(1551107627514);
   });
 
-  it("test function getUpdatedTransaction", () => {
+  it("tests function getUpdatedTransaction", () => {
     const wrapper = shallow(
       <TransactionToastUtil transactions={componentProps} />
     );
@@ -243,7 +255,16 @@ describe("TransactionToastUtil unit tests", () => {
       componentProps,
       changedStatusProps
     );
-    console.log("Results: ", results);
     expect(results.created).toBe(1551107627514);
+  });
+
+  it("tests function getTransactionToastMeta", () => {
+    const wrapper = shallow(
+      <TransactionToastUtil transactions={componentProps} />
+    );
+
+    const instance = wrapper.instance();
+    let results = instance.getTransactionToastMeta(singleTx);
+    expect(results.message).toBe("Smart contract value changed");
   });
 });
